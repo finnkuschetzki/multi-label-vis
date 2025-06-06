@@ -1,8 +1,12 @@
 import tensorflow as tf
 from keras.applications import EfficientNetV2B0
-from keras import layers, models, optimizers
+from keras import layers, models, optimizers, callbacks
+
 from preprocess import *
 from pipeline import *
+
+
+EPOCHS = 1   # todo small value for testing
 
 
 # creating the model
@@ -24,9 +28,25 @@ model.compile(
     metrics=["accuracy"]
 )
 
+# training the model
+checkpoint_filepath = "output/checkpoints/{epoch:02d}-{val_loss:.2f}.keras"
+model_checkpoint = callbacks.ModelCheckpoint(
+    filepath=checkpoint_filepath,
+    monitor="val_loss",
+    save_best_only=True,
+    mode="auto",
+    verbose=1
+)
+
+model.fit(
+    train_dataset,
+    validation_data=val_dataset,
+    epochs=EPOCHS,
+    callbacks=[model_checkpoint]
+)
 
 def predict_image(image_path):
-    img = load_image(image_path)
+    img, _ = load_image(image_path, None)  # todo make this better
     img = tf.expand_dims(img, 0)
 
     probs = model.predict(img)[0]
@@ -36,6 +56,6 @@ def predict_image(image_path):
 
 # todo only for testing
 if __name__ == "__main__":
-    image_id = 100000
-    print({ann["category_id"] for ann in coco_train.loadAnns(coco_train.getAnnIds(imgIds=[image_id]))})
-    predict_image(TRAIN_IMG_DIR + f"000000{image_id}.jpg")
+    image_path, multi_hot_encoding = val_image_infos[1]
+    print([multi_hot_index_to_category_id[i] for i, val in enumerate(multi_hot_encoding) if val == 1])
+    predict_image(image_path)

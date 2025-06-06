@@ -3,9 +3,9 @@ from collections import defaultdict
 import numpy as np
 
 
-DATA_DIR = "../coco_dataset/data/"
-TRAIN_IMG_DIR = DATA_DIR + "/images/train2017/"
-VAL_IMG_DIR = DATA_DIR + "/images/val2017/"
+DATA_DIR = "../coco_dataset/data"
+TRAIN_IMG_DIR = DATA_DIR + "/images/train2017"
+VAL_IMG_DIR = DATA_DIR + "/images/val2017"
 
 
 # creating COCO instances (annotations for train2017 and val2017)
@@ -44,11 +44,11 @@ for ann in train_anns + val_anns:
     image_labels[image_id].add(multi_hot_index)
 
 # list images with labels
-def get_image_infos(coco_instance): # generates image_infos for given coco_instance
+def get_image_infos(coco_instance, img_dir): # generates image_infos for given coco_instance
     image_infos = []
 
     for img in coco_instance.loadImgs(coco_instance.getImgIds()):
-        img_path = TRAIN_IMG_DIR + img["file_name"]
+        img_path = img_dir + "/" + img["file_name"]
         img_labels = image_labels[img["id"]]
         multi_hot_encoding = np.zeros(num_classes, dtype=np.float32)
         multi_hot_encoding[list(img_labels)] = 1.0
@@ -56,8 +56,8 @@ def get_image_infos(coco_instance): # generates image_infos for given coco_insta
 
     return image_infos
 
-train_image_infos = get_image_infos(coco_train)
-val_image_infos = get_image_infos(coco_val)
+train_image_infos = get_image_infos(coco_train, TRAIN_IMG_DIR)
+val_image_infos = get_image_infos(coco_val, VAL_IMG_DIR)
 
 
 # configure export
