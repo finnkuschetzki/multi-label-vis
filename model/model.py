@@ -4,6 +4,7 @@ from keras import layers, models, optimizers, callbacks
 
 from preprocess import *
 from pipeline import *
+from custom_callback import *
 
 
 EPOCHS = 1   # todo small value for testing
@@ -42,8 +43,9 @@ model.fit(
     train_dataset,
     validation_data=val_dataset,
     epochs=EPOCHS,
-    callbacks=[model_checkpoint]
+    callbacks=[model_checkpoint, EpochTimer()]
 )
+
 
 def predict_image(image_path):
     img, _ = load_image(image_path, None)  # todo make this better
