@@ -17,7 +17,7 @@ base_model = EfficientNetV2B0(
     pooling="avg"
 )
 
-outputs_layer = layers.Dense(num_classes, activation="sigmoid")(base_model.output)
+outputs_layer = layers.Dense(num_train_classes, activation="sigmoid")(base_model.output)
 
 model = models.Model(inputs=base_model.input, outputs=outputs_layer)
 

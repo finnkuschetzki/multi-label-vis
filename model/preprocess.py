@@ -7,13 +7,20 @@ DATA_DIR = "../coco_dataset/data"
 TRAIN_IMG_DIR = DATA_DIR + "/images/train2017"
 VAL_IMG_DIR = DATA_DIR + "/images/val2017"
 
+CATEGORY_INDICES = [
+    44, 46, 47, 48, 49, 50, 51,  # kitchen categories
+    62, 63, 64, 65, 67, 70,  # furniture categories
+    72, 73, 74, 75, 76, 77  # electronic furniture
+]
+
 
 # creating COCO instances (annotations for train2017 and val2017)
 coco_train = COCO(DATA_DIR + "/annotations/instances_train2017.json")
 coco_val = COCO(DATA_DIR + "/annotations/instances_val2017.json")
 
 categories = coco_train.loadCats(coco_train.getCatIds())  # this assumes that all classes are present in train and val data
-num_classes = len(categories)
+num_coco_classes = len(categories)
+num_train_classes = len(CATEGORY_INDICES)
 
 # map category_id to multi_hot index
 category_id_to_multi_hot_index = {
@@ -43,6 +50,7 @@ for ann in train_anns + val_anns:
     multi_hot_index = category_id_to_multi_hot_index[category_id]
     image_labels[image_id].add(multi_hot_index)
 
+
 # list images with labels
 def get_image_infos(coco_instance, img_dir): # generates image_infos for given coco_instance
     image_infos = []
@@ -50,14 +58,28 @@ def get_image_infos(coco_instance, img_dir): # generates image_infos for given c
     for img in coco_instance.loadImgs(coco_instance.getImgIds()):
         img_path = img_dir + "/" + img["file_name"]
         img_labels = image_labels[img["id"]]
-        multi_hot_encoding = np.zeros(num_classes, dtype=np.float32)
+        multi_hot_encoding = np.zeros(num_coco_classes, dtype=np.float32)
         multi_hot_encoding[list(img_labels)] = 1.0
         image_infos.append((img_path, multi_hot_encoding))
 
     return image_infos
 
-train_image_infos = get_image_infos(coco_train, TRAIN_IMG_DIR)
-val_image_infos = get_image_infos(coco_val, VAL_IMG_DIR)
+
+# limit labels to specific categories and filter out images without label
+def limit_to_categories(image_infos, category_ids):
+    multi_hot_indices = np.array([category_id_to_multi_hot_index[cat_id] for cat_id in category_ids])
+    filtered_image_infos = []
+
+    for img_path, multi_hot_encoding in image_infos:
+        multi_hot_encoding = multi_hot_encoding[multi_hot_indices]
+        if not np.all(multi_hot_encoding == 0):
+            filtered_image_infos.append((img_path, multi_hot_encoding))
+
+    return filtered_image_infos
+
+
+train_image_infos = limit_to_categories(get_image_infos(coco_train, TRAIN_IMG_DIR), CATEGORY_INDICES)
+val_image_infos = limit_to_categories(get_image_infos(coco_val, VAL_IMG_DIR), CATEGORY_INDICES)
 
 
 # configure export
@@ -66,7 +88,7 @@ __all__ = [
     "TRAIN_IMG_DIR",
     "coco_train",
     "coco_val",
-    "num_classes",
+    "num_train_classes",
     "multi_hot_index_to_category_id",
     "multi_hot_index_to_category_name",
     "train_image_infos",
