@@ -12,7 +12,7 @@ VAL_IMG_DIR = DATA_DIR + "/images/val2017/"
 coco_train = COCO(DATA_DIR + "/annotations/instances_train2017.json")
 coco_val = COCO(DATA_DIR + "/annotations/instances_val2017.json")
 
-categories = set(coco_train.loadCats(coco_train.getCatIds())).union(coco_val.loadCats(coco_val.getCatIds()))
+categories = coco_train.loadCats(coco_train.getCatIds())  # this assumes that all classes are present in train and val data
 num_classes = len(categories)
 
 # map category_id to multi_hot index
