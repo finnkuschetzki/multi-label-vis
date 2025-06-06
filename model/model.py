@@ -43,7 +43,11 @@ model.fit(
     train_dataset,
     validation_data=val_dataset,
     epochs=EPOCHS,
-    callbacks=[model_checkpoint, EpochTimer()]
+    callbacks=[
+        model_checkpoint,
+        callbacks.TensorBoard(log_dir="output/logs"),
+        EpochTimer()
+    ]
 )
 
 
