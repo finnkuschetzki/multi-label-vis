@@ -13,7 +13,6 @@ class EpochTimer(callbacks.Callback):
         sys.stdout.write("\n")
         sys.stdout.write(f"Epoch {epoch + 1}: took {total_time:.2f} seconds")
         sys.stdout.flush()
-        # print(f"Epoch {epoch + 1}: took {total_time:.2f} seconds")
 
 
 # --- callback instances ---
@@ -42,6 +41,9 @@ tensor_board_head_only = callbacks.TensorBoard(log_dir="output/logs/head_only", 
 
 tensor_board_fine_tune = callbacks.TensorBoard(log_dir="output/logs/fine_tune", profile_batch=0)
 
+# not used during head only training
+lr_scheduler_fine_tune = callbacks.ReduceLROnPlateau(monitor="val_loss", factor=0.5, patience=3, min_lr=1e-6, verbose=1)
+
 
 # --- callback lists ---
 
@@ -55,6 +57,7 @@ callbacks_fine_tune = [
     epoch_timer,
     model_checkpoint_fine_tune,
     tensor_board_fine_tune,
+    lr_scheduler_fine_tune,
 ]
 
 

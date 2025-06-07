@@ -37,7 +37,7 @@ model = models.Model(inputs=base_model.input, outputs=outputs_layer)
 base_model.trainable = False
 
 model.compile(
-    optimizer=optimizers.Adam(1e-4),
+    optimizer=optimizers.Adam(1e-3),
     loss="binary_crossentropy",
     metrics=["accuracy"]
 )
@@ -57,7 +57,7 @@ model.save("output/head_only.keras")
 base_model.trainable = True
 
 model.compile(
-    optimizer=optimizers.Adam(1e-4),
+    optimizer=optimizers.Adam(1e-5),
     loss="binary_crossentropy",
     metrics=["accuracy"]
 )
@@ -66,7 +66,7 @@ model.fit(
     train_dataset,
     validation_data=val_dataset,
     epochs=MAX_FINETUNE_EPOCHS,
-    callbacks=callbacks_fine_tune,
+    callbacks=[callbacks_fine_tune],
 )
 
 model.save("output/fine_tuned.keras")
