@@ -42,6 +42,8 @@ model.fit(
     callbacks=[callbacks]
 )
 
+model.save("output/head_only.keras")
+
 
 # --- fine tuning ---
 
@@ -59,6 +61,8 @@ model.fit(
     epochs=MAX_FINETUNE_EPOCHS,
     callbacks=callbacks
 )
+
+model.save("output/fine_tuned.keras")
 
 
 def predict_image(image_path):
