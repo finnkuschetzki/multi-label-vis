@@ -2,7 +2,7 @@ import os
 import shutil
 import tensorflow as tf
 from keras.applications import EfficientNetV2B0
-from keras import layers, models, optimizers
+from keras import layers, models, optimizers, metrics
 
 from preprocess import *
 from pipeline import *
@@ -39,7 +39,11 @@ base_model.trainable = False
 model.compile(
     optimizer=optimizers.Adam(1e-3),
     loss="binary_crossentropy",
-    metrics=["accuracy"]
+    metrics=[
+        metrics.BinaryAccuracy(name="accuracy"),
+        metrics.Precision(name="precision"),
+        metrics.Recall(name="recall"),
+    ]
 )
 
 model.fit(
@@ -59,7 +63,11 @@ base_model.trainable = True
 model.compile(
     optimizer=optimizers.Adam(1e-5),
     loss="binary_crossentropy",
-    metrics=["accuracy"]
+    metrics=[
+        metrics.BinaryAccuracy(name="accuracy"),
+        metrics.Precision(name="precision"),
+        metrics.Recall(name="recall"),
+    ]
 )
 
 model.fit(
