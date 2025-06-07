@@ -1,3 +1,5 @@
+import os
+import shutil
 import tensorflow as tf
 from keras.applications import EfficientNetV2B0
 from keras import layers, models, optimizers
@@ -9,6 +11,11 @@ from custom_callbacks import *
 
 TRAIN_HEAD_EPOCHS = 5
 MAX_FINETUNE_EPOCHS = 5  # todo small value for testing
+
+
+# cleaning output directory
+if os.path.exists("output") and os.path.isdir("output"):
+    shutil.rmtree("output")
 
 
 # --- creating the model ---
@@ -39,7 +46,7 @@ model.fit(
     train_dataset,
     validation_data=val_dataset,
     epochs=TRAIN_HEAD_EPOCHS,
-    callbacks=[callbacks]
+    callbacks=callbacks_head_only,
 )
 
 model.save("output/head_only.keras")
@@ -59,7 +66,7 @@ model.fit(
     train_dataset,
     validation_data=val_dataset,
     epochs=MAX_FINETUNE_EPOCHS,
-    callbacks=callbacks
+    callbacks=callbacks_fine_tune,
 )
 
 model.save("output/fine_tuned.keras")
