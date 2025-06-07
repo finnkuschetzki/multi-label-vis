@@ -1,16 +1,18 @@
 import tensorflow as tf
 from keras.applications import EfficientNetV2B0
-from keras import layers, models, optimizers, callbacks
+from keras import layers, models, optimizers
 
 from preprocess import *
 from pipeline import *
-from custom_callback import *
+from custom_callbacks import *
 
 
-EPOCHS = 1   # todo small value for testing
+TRAIN_HEAD_EPOCHS = 5
+MAX_FINETUNE_EPOCHS = 5  # todo small value for testing
 
 
-# creating the model
+# --- creating the model ---
+
 base_model = EfficientNetV2B0(
     include_top=False,
     input_shape=(IMG_SIZE, IMG_SIZE, 3),
@@ -22,32 +24,40 @@ outputs_layer = layers.Dense(num_train_classes, activation="sigmoid")(base_model
 
 model = models.Model(inputs=base_model.input, outputs=outputs_layer)
 
-# compiling the model
+
+# --- train head only ---
+
+base_model.trainable = False
+
 model.compile(
     optimizer=optimizers.Adam(1e-4),
     loss="binary_crossentropy",
     metrics=["accuracy"]
 )
 
-# training the model
-checkpoint_filepath = "output/checkpoints/{epoch:02d}-{val_loss:.2f}.keras"
-model_checkpoint = callbacks.ModelCheckpoint(
-    filepath=checkpoint_filepath,
-    monitor="val_loss",
-    save_best_only=True,
-    mode="auto",
-    verbose=1
+model.fit(
+    train_dataset,
+    validation_data=val_dataset,
+    epochs=TRAIN_HEAD_EPOCHS,
+    callbacks=[callbacks]
+)
+
+
+# --- fine tuning ---
+
+base_model.trainable = True
+
+model.compile(
+    optimizer=optimizers.Adam(1e-4),
+    loss="binary_crossentropy",
+    metrics=["accuracy"]
 )
 
 model.fit(
     train_dataset,
     validation_data=val_dataset,
-    epochs=EPOCHS,
-    callbacks=[
-        model_checkpoint,
-        callbacks.TensorBoard(log_dir="output/logs"),
-        EpochTimer()
-    ]
+    epochs=MAX_FINETUNE_EPOCHS,
+    callbacks=callbacks
 )
 
 
