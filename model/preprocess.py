@@ -16,6 +16,7 @@ CATEGORY_INDICES = [
 
 # creating COCO instances (annotations for train2017 and val2017)
 coco_train = COCO(DATA_DIR + "/annotations/instances_train2017.json")
+print()
 coco_val = COCO(DATA_DIR + "/annotations/instances_val2017.json")
 
 categories = coco_train.loadCats(coco_train.getCatIds())  # this assumes that all classes are present in train and val data
