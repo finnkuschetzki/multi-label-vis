@@ -11,7 +11,7 @@ from custom_callbacks import *
 
 
 TRAIN_HEAD_EPOCHS = 5
-MAX_FINETUNE_EPOCHS = 5  # todo small value for testing
+MAX_FINETUNE_EPOCHS = 30
 
 
 # --- creating the model ---
