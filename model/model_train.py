@@ -18,27 +18,27 @@ MAX_FINETUNE_EPOCHS = 30
 
 def create_model():
 
-    base_model = EfficientNetV2B0(
+    base_model_ = EfficientNetV2B0(
         include_top=False,
         input_shape=(IMG_SIZE, IMG_SIZE, 3),
         weights="imagenet",
         pooling="avg"
     )
 
-    outputs_layer = layers.Dense(num_train_classes, activation="sigmoid")(base_model.output)
+    outputs_layer_ = layers.Dense(num_train_classes, activation="sigmoid")(base_model_.output)
 
-    model = models.Model(inputs=base_model.input, outputs=outputs_layer)
+    model_ = models.Model(inputs=base_model_.input, outputs=outputs_layer_)
 
-    return base_model, model
+    return base_model_, model_
 
 
 # --- train head only ---
 
-def train_head_only(base_model, model):
+def train_head_only(base_model_, model_):
 
-    base_model.trainable = False
+    base_model_.trainable = False
 
-    model.compile(
+    model_.compile(
         optimizer=optimizers.Adam(1e-3),
         loss="binary_crossentropy",
         metrics=[
@@ -48,23 +48,23 @@ def train_head_only(base_model, model):
         ]
     )
 
-    model.fit(
+    model_.fit(
         train_dataset,
         validation_data=val_dataset,
         epochs=TRAIN_HEAD_EPOCHS,
         callbacks=callbacks_head_only,
     )
 
-    base_model.trainable = True
+    base_model_.trainable = True
 
-    model.save("output/head_only.keras")
+    model_.save("output/head_only.keras")
 
 
 # --- fine tuning ---
 
-def fine_tune(model, initial_epoch=0):
+def fine_tune(model_, initial_epoch=0):
 
-    model.compile(
+    model_.compile(
         optimizer=optimizers.Adam(1e-5),
         loss="binary_crossentropy",
         metrics=[
@@ -74,7 +74,7 @@ def fine_tune(model, initial_epoch=0):
         ]
     )
 
-    model.fit(
+    model_.fit(
         train_dataset,
         validation_data=val_dataset,
         epochs=MAX_FINETUNE_EPOCHS,
@@ -82,7 +82,7 @@ def fine_tune(model, initial_epoch=0):
         callbacks=[callbacks_fine_tune],
     )
 
-    model.save("output/fine_tuned.keras")
+    model_.save("output/fine_tuned.keras")
 
 
 # --- managing execution ---
