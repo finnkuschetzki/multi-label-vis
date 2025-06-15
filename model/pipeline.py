@@ -15,19 +15,19 @@ def get_image_labels(image_id):
     return labels
 
 
-def load_image(image_path, label_vector):
+def load_image(image_path):
     img = tf.io.read_file(image_path)
     img = tf.image.decode_jpeg(img, channels=3)
     img = tf.image.resize(img, [IMG_SIZE, IMG_SIZE])
     img = tf.cast(img, tf.float32) / 255.0
-    return img, label_vector
+    return img
 
 
 def get_dataset(image_infos):
     image_paths, label_vectors = zip(*image_infos)
     image_paths, label_vectors = np.array(image_paths), np.array(label_vectors)
     dataset = tf.data.Dataset.from_tensor_slices((image_paths, label_vectors))
-    dataset = dataset.map(load_image, num_parallel_calls=tf.data.AUTOTUNE)
+    dataset = dataset.map(lambda path, label_vec: (load_image(path), label_vec), num_parallel_calls=tf.data.AUTOTUNE)
     dataset = dataset.shuffle(1000).batch(32).prefetch(tf.data.AUTOTUNE)
     return dataset
 

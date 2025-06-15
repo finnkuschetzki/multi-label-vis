@@ -6,7 +6,7 @@ from pipeline import *
 
 
 def predict_image(model, image_path):
-    img, _ = load_image(image_path, None)  # todo make this better
+    img = load_image(image_path)
     img = tf.expand_dims(img, 0)
 
     probs = model.predict(img)[0]
