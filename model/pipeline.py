@@ -23,16 +23,18 @@ def load_image(image_path):
     return img
 
 
-def get_dataset(image_infos):
+def get_dataset(image_infos, train=False):
     image_paths, label_vectors = zip(*image_infos)
     image_paths, label_vectors = np.array(image_paths), np.array(label_vectors)
     dataset = tf.data.Dataset.from_tensor_slices((image_paths, label_vectors))
     dataset = dataset.map(lambda path, label_vec: (load_image(path), label_vec), num_parallel_calls=tf.data.AUTOTUNE)
-    dataset = dataset.shuffle(1000).batch(32).prefetch(tf.data.AUTOTUNE)
+    if train:
+        dataset = dataset.shuffle(1000)
+    dataset = dataset.batch(32).prefetch(tf.data.AUTOTUNE)
     return dataset
 
 
-train_dataset = get_dataset(train_image_infos)
+train_dataset = get_dataset(train_image_infos, train=True)
 val_dataset = get_dataset(val_image_infos)
 
 
