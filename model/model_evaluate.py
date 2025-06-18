@@ -20,7 +20,7 @@ all_y_true = []
 all_y_pred = []
 
 # calculate y_true and y_pred per batch and add to list
-print("predicting ...")
+print("predicting...")
 for batch_images, batch_labels in val_dataset:
     y_probs = model.predict(batch_images, verbose=0)
     y_pred = (y_probs >= 0.5).astype(int)
@@ -67,14 +67,22 @@ print()
 y_true_flat = all_y_true.flatten()
 y_pred_flat = all_y_pred.flatten()
 
-overall_accuracy = accuracy_score(y_true_flat, y_pred_flat)
-overall_precision = precision_score(y_true_flat, y_pred_flat, zero_division=0)
-overall_recall = recall_score(y_true_flat, y_pred_flat, zero_division=0)
+overall_accuracy = accuracy_score(y_true_flat, y_pred_flat)  # hamming accuracy
+overall_micro_precision = precision_score(all_y_true, all_y_pred, zero_division=0, average="micro")
+overall_macro_precision = precision_score(all_y_true, all_y_pred, zero_division=0, average="macro")
+overall_weighted_precision = precision_score(all_y_true, all_y_pred, zero_division=0, average="weighted")
+overall_micro_recall = recall_score(all_y_true, all_y_pred, zero_division=0, average="micro")
+overall_macro_recall = recall_score(all_y_true, all_y_pred, zero_division=0, average="macro")
+overall_weighted_recall = recall_score(all_y_true, all_y_pred, zero_division=0, average="weighted")
 
 print("Overall Metrics:")
 print(f"  Accuracy: {overall_accuracy:.4f}")
-print(f"  Precision: {overall_precision:.4f}")
-print(f"  Recall: {overall_recall:.4f}")
+print(f"  Micro Precision: {overall_micro_precision:.4f}")
+print(f"  Macro Precision: {overall_macro_precision:.4f}")
+print(f"  Weighted Precision: {overall_weighted_precision:.4f}")
+print(f"  Micro Recall: {overall_micro_recall:.4f}")
+print(f"  Macro Recall: {overall_macro_recall:.4f}")
+print(f"  Weighted Recall: {overall_weighted_recall:.4f}")
 
 
 # --- saving metrics ---
