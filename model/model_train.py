@@ -25,7 +25,8 @@ def create_model():
         pooling="avg"
     )
 
-    outputs_layer_ = layers.Dense(num_train_classes, activation="sigmoid")(base_model_.output)
+    dropout_layer_ = layers.Dropout(0.3)(base_model_.output)
+    outputs_layer_ = layers.Dense(num_train_classes, activation="sigmoid")(dropout_layer_)
 
     model_ = models.Model(inputs=base_model_.input, outputs=outputs_layer_)
 
