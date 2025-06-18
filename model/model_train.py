@@ -18,17 +18,24 @@ MAX_FINETUNE_EPOCHS = 30
 
 def create_model():
 
+    inputs_layer_ = layers.Input(shape=(IMG_SIZE, IMG_SIZE, 3))
+    data_augmentation_ = models.Sequential([
+        layers.RandomFlip("horizontal"),
+        layers.RandomCrop(IMG_SIZE, IMG_SIZE),
+        layers.Resizing(IMG_SIZE, IMG_SIZE),
+    ])(inputs_layer_)
+
     base_model_ = EfficientNetV2B0(
         include_top=False,
         input_shape=(IMG_SIZE, IMG_SIZE, 3),
         weights="imagenet",
         pooling="avg"
-    )
+    )(data_augmentation_)
 
-    dropout_layer_ = layers.Dropout(0.3)(base_model_.output)
+    dropout_layer_ = layers.Dropout(0.3)(base_model_)
     outputs_layer_ = layers.Dense(num_train_classes, activation="sigmoid")(dropout_layer_)
 
-    model_ = models.Model(inputs=base_model_.input, outputs=outputs_layer_)
+    model_ = models.Model(inputs=inputs_layer_, outputs=outputs_layer_)
 
     return base_model_, model_
 
