@@ -5,6 +5,12 @@ from ast import literal_eval
 from sklearn.preprocessing import StandardScaler, MinMaxScaler
 from sklearn.decomposition import PCA
 
+from dimensionality_reduction.dgrid.dgrid import DGrid  # see https://github.com/fpaulovich/dimensionality-reduction/
+
+
+WIDTH, HEIGHT = 0.01, 0.01  # results in 1 / (0.01 * 0.01) = 10,000 cells in visualization
+DELTA = 1.0
+
 
 # --- read and process data ---
 
@@ -37,6 +43,10 @@ pca = PCA(n_components=2)
 pca_features = pca.fit_transform(standardized_features)
 scaled_pca_features = min_max_scaler.fit_transform(pca_features)
 out_df["pca_features"] = scaled_pca_features.tolist()
+
+# overlap removal
+scaled_pca_features_or = DGrid(WIDTH, HEIGHT, DELTA).fit_transform(scaled_pca_features)
+out_df["pca_features_or"] = scaled_pca_features_or.tolist()
 
 
 # --- saving data ---
