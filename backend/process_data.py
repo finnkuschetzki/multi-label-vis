@@ -2,7 +2,7 @@ import os
 import numpy as np
 import pandas as pd
 from ast import literal_eval
-from sklearn.preprocessing import StandardScaler
+from sklearn.preprocessing import StandardScaler, MinMaxScaler
 from sklearn.decomposition import PCA
 
 
@@ -15,8 +15,10 @@ in_df["predictions"] = in_df["predictions"].apply(literal_eval)
 in_df["binarized_predictions"] = in_df["binarized_predictions"].apply(literal_eval)
 features = np.array(in_df["features"].tolist())
 
-sc = StandardScaler()
-standardized_features = sc.fit_transform(features)
+standard_scaler = StandardScaler()
+standardized_features = standard_scaler.fit_transform(features)
+
+min_max_scaler = MinMaxScaler()
 
 
 # --- prepare data saving ---
@@ -33,7 +35,8 @@ out_df = in_df.filter(["ground_truth", "predictions", "binarized_predictions"])
 
 pca = PCA(n_components=2)
 pca_features = pca.fit_transform(standardized_features)
-out_df["pca_features"] = pca_features.tolist()
+scaled_pca_features = min_max_scaler.fit_transform(pca_features)
+out_df["pca_features"] = scaled_pca_features.tolist()
 
 
 # --- saving data ---
