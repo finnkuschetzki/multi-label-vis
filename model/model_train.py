@@ -21,7 +21,7 @@ def create_model():
     inputs_layer_ = layers.Input(shape=(IMG_SIZE, IMG_SIZE, 3))
     data_augmentation_ = models.Sequential([
         layers.RandomFlip("horizontal"),
-        layers.RandomCrop(IMG_SIZE, IMG_SIZE),
+        layers.RandomCrop(IMG_SIZE - 28, IMG_SIZE - 28),
         layers.Resizing(IMG_SIZE, IMG_SIZE),
     ])(inputs_layer_)
 
