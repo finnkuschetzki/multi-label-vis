@@ -5,11 +5,17 @@ import matplotlib.pyplot as plt
 from keras import models
 from sklearn.metrics import accuracy_score, precision_score, recall_score
 
+from _command_line_tools import *
 from preprocess import *
 from pipeline import *
 
 
-model = models.load_model("output/fine_tuned.keras")
+MODEL_DIR = get_model_dir()
+
+print()
+print(f"using model from directory: {MODEL_DIR}")
+
+model = models.load_model(f"{MODEL_DIR}/fine_tuned.keras")
 
 
 # --- per class metrics ---
@@ -87,7 +93,7 @@ print(f"  Weighted Recall: {overall_weighted_recall:.4f}")
 
 # --- saving metrics ---
 
-directory = "output/val_stats"
+directory = f"{MODEL_DIR}/val_stats"
 if not os.path.exists(directory):
     os.makedirs(directory)
 

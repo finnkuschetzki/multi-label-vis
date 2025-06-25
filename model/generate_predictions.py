@@ -1,10 +1,16 @@
 import pandas as pd
 from keras import models
 
+from _command_line_tools import *
 from pipeline import *
 
 
-model = models.load_model("output/fine_tuned.keras")
+MODEL_DIR = get_model_dir()
+
+print()
+print(f"using model from directory: {MODEL_DIR}")
+
+model = models.load_model(f"{MODEL_DIR}/fine_tuned.keras")
 
 base_model = models.Model(
     inputs = model.input,
@@ -32,7 +38,7 @@ print("finished!")
 
 # saving into csv
 df = pd.DataFrame(rows)
-df.to_csv("output/embedding_data.csv", index=False)
+df.to_csv("/embedding_data.csv", index=False)
 
 print()
-print("saved ground_truth, features, predictions, binarized_predictions as output/embedding_data.csv")
+print(f"saved ground_truth, features, predictions, binarized_predictions as {MODEL_DIR}/embedding_data.csv")
