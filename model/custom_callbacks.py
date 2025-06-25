@@ -44,7 +44,8 @@ tensor_board_fine_tune = callbacks.TensorBoard(log_dir="output/logs/fine_tune", 
 # not used during head only training
 lr_scheduler_fine_tune = callbacks.ReduceLROnPlateau(monitor="val_loss", factor=0.5, patience=3, min_lr=1e-6, verbose=1)
 
-# not used during head only training
+early_stopping_head_only = callbacks.EarlyStopping(monitor="val_loss", patience=2, restore_best_weights=True, min_delta=0.001, mode="min", verbose=1)
+
 early_stopping_fine_tune = callbacks.EarlyStopping(monitor="val_loss", patience=5, restore_best_weights=True, min_delta=0.001, mode="min", verbose=1)
 
 
@@ -54,6 +55,7 @@ callbacks_head_only = [
     epoch_timer,
     model_checkpoint_head_only,
     tensor_board_head_only,
+    early_stopping_head_only,
 ]
 
 callbacks_fine_tune = [
