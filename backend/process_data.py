@@ -5,6 +5,7 @@ import pandas as pd
 from ast import literal_eval
 from sklearn.preprocessing import StandardScaler, MinMaxScaler
 from sklearn.decomposition import PCA
+from sklearn.manifold import TSNE
 from umap import UMAP
 
 from dimensionality_reduction.dgrid.dgrid import DGrid  # see https://github.com/fpaulovich/dimensionality-reduction/
@@ -84,6 +85,26 @@ def process_data():
     print(f"Done (t={end - start:.2f}s)")
 
 
+    # --- t-SNE ---
+
+    print()
+    start = time.time()
+
+    print("t-SNE...")
+    tsne = TSNE(n_components=2)
+    tsne_features = tsne.fit_transform(standardized_features)
+    scaled_tsne_features = min_max_scaler.fit_transform(tsne_features)
+    out_df["tsne_features"] = scaled_tsne_features.tolist()
+
+    # overlap removal
+    print("Overlap Removal...")
+    scaled_tsne_features_or = DGrid(WIDTH, HEIGHT, DELTA).fit_transform(scaled_tsne_features)
+    out_df["tsne_features_or"] = scaled_tsne_features_or.tolist()
+
+    end = time.time()
+    print(f"Done (t={end - start:.2f}s)")
+
+
     # --- saving data ---
 
     out_df.to_csv('data/dimensionality_reduction.csv', index=False)
@@ -102,6 +123,9 @@ def get_data_as_json():
 
     df["umap_features"] = df["umap_features"].apply(literal_eval)
     df["umap_features_or"] = df["umap_features_or"].apply(literal_eval)
+
+    df["tsne_features"] = df["tsne_features"].apply(literal_eval)
+    df["tsne_features_or"] = df["tsne_features_or"].apply(literal_eval)
 
     return df.to_json(orient="records")
 
