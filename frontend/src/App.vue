@@ -1,4 +1,5 @@
 <script setup>
+import Scatterplot from "@/components/Scatterplot.vue"
 import { ref } from "vue"
 
 // menu refs
@@ -16,6 +17,8 @@ const useDGrid = ref(true)
       </div>
 
     </div>
+
+    <Scatterplot />
 
   </div>
 </template>
