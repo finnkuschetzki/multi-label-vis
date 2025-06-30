@@ -1,4 +1,5 @@
 import os
+import time
 import numpy as np
 import pandas as pd
 from ast import literal_eval
@@ -44,26 +45,37 @@ def process_data():
 
     # --- PCA ---
 
+    print()
+    start = time.time()
+
+    print("pca...")
     pca = PCA(n_components=2)
     pca_features = pca.fit_transform(standardized_features)
     scaled_pca_features = min_max_scaler.fit_transform(pca_features)
     out_df["pca_features"] = scaled_pca_features.tolist()
 
     # overlap removal
+    print("overlap removal...")
     scaled_pca_features_or = DGrid(WIDTH, HEIGHT, DELTA).fit_transform(scaled_pca_features)
     out_df["pca_features_or"] = scaled_pca_features_or.tolist()
+
+    end = time.time()
+    print(f"Done (t={end - start:.2f}s)")
 
 
     # --- saving data ---
 
     out_df.to_csv('data/dimensionality_reduction.csv', index=False)
 
-    print("dimensionality reduction and overlap removal done!")
-
 
 def get_data_as_json():
 
     df = pd.read_csv("data/dimensionality_reduction.csv")
+    df["ground_truth"] = df["ground_truth"].apply(literal_eval)
+    df["predictions"] = df["predictions"].apply(literal_eval)
+    df["binarized_predictions"] = df["binarized_predictions"].apply(literal_eval)
+    df["pca_features"] = df["pca_features"].apply(literal_eval)
+    df["pca_features_or"] = df["pca_features_or"].apply(literal_eval)
     return df.to_json(orient="records")
 
 
