@@ -1,5 +1,6 @@
 import os
 from flask import Flask
+from flask_cors import CORS
 
 from process_data import *
 
@@ -11,6 +12,7 @@ if not os.path.exists("data/dimensionality_reduction.csv"):
     print()
 
 app = Flask(__name__)
+CORS(app, origins=["http://localhost:5173"])
 
 
 @app.route('/')
