@@ -5,6 +5,7 @@ import pandas as pd
 from ast import literal_eval
 from sklearn.preprocessing import StandardScaler, MinMaxScaler
 from sklearn.decomposition import PCA
+from umap import UMAP
 
 from dimensionality_reduction.dgrid.dgrid import DGrid  # see https://github.com/fpaulovich/dimensionality-reduction/
 
@@ -48,16 +49,36 @@ def process_data():
     print()
     start = time.time()
 
-    print("pca...")
+    print("PCA...")
     pca = PCA(n_components=2)
     pca_features = pca.fit_transform(standardized_features)
     scaled_pca_features = min_max_scaler.fit_transform(pca_features)
     out_df["pca_features"] = scaled_pca_features.tolist()
 
     # overlap removal
-    print("overlap removal...")
+    print("Overlap Removal...")
     scaled_pca_features_or = DGrid(WIDTH, HEIGHT, DELTA).fit_transform(scaled_pca_features)
     out_df["pca_features_or"] = scaled_pca_features_or.tolist()
+
+    end = time.time()
+    print(f"Done (t={end - start:.2f}s)")
+
+
+    # --- UMAP ---
+
+    print()
+    start = time.time()
+
+    print("UMAP...")
+    umap = UMAP()
+    umap_features = umap.fit_transform(standardized_features)
+    scaled_umap_features = min_max_scaler.fit_transform(umap_features)
+    out_df["umap_features"] = scaled_umap_features.tolist()
+
+    # overlap removal
+    print("Overlap Removal...")
+    scaled_umap_features_or = DGrid(WIDTH, HEIGHT, DELTA).fit_transform(scaled_umap_features)
+    out_df["umap_features_or"] = scaled_umap_features_or.tolist()
 
     end = time.time()
     print(f"Done (t={end - start:.2f}s)")
@@ -71,11 +92,17 @@ def process_data():
 def get_data_as_json():
 
     df = pd.read_csv("data/dimensionality_reduction.csv")
+
     df["ground_truth"] = df["ground_truth"].apply(literal_eval)
     df["predictions"] = df["predictions"].apply(literal_eval)
     df["binarized_predictions"] = df["binarized_predictions"].apply(literal_eval)
+
     df["pca_features"] = df["pca_features"].apply(literal_eval)
     df["pca_features_or"] = df["pca_features_or"].apply(literal_eval)
+
+    df["umap_features"] = df["umap_features"].apply(literal_eval)
+    df["umap_features_or"] = df["umap_features_or"].apply(literal_eval)
+
     return df.to_json(orient="records")
 
 
