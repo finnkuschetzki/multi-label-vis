@@ -5,12 +5,12 @@ import { ref } from "vue"
 // menu refs
 const useDGrid = ref(true)
 
-const dimReductionOptions = ref([
+const dimensionalityReductionOptions = ref([
   { name: "PCA", value: "pca" },
   { name: "UMAP", value: "umap" },
   { name: "t-SNE", value: "tsne" }
 ])
-const dimReduction = ref()
+const dimensionalityReduction = ref("pca")
 </script>
 
 <template>
@@ -24,12 +24,20 @@ const dimReduction = ref()
       </div>
 
       <div>
-        <SelectButton v-model="dimReduction" :options="dimReductionOptions" option-label="name" />
+        <SelectButton
+            v-model="dimensionalityReduction"
+            :options="dimensionalityReductionOptions"
+            option-label="name"
+            option-value="value"
+        />
       </div>
 
     </div>
 
-    <Scatterplot />
+    <Scatterplot
+        :use-d-grid="useDGrid"
+        :dimensionality-reduction="dimensionalityReduction"
+    />
 
   </div>
 </template>

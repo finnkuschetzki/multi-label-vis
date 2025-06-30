@@ -3,6 +3,16 @@ import axios from "axios"
 import { ref, onMounted, watchEffect } from "vue"
 import * as d3 from "d3"
 
+const props = defineProps({
+  useDGrid: {
+    type: Boolean,
+    required: true
+  },
+  dimensionalityReduction: {
+
+  }
+})
+
 // data
 const data = ref()
 
@@ -49,12 +59,15 @@ function updateChart() {
       .domain([0,1])
       .range([0, size - margin.top - margin.right])
 
+  let feature_column = `${props.dimensionalityReduction}_features`;
+  if (props.useDGrid) feature_column += "_or"
+
   svg.selectAll("circle")
       .data(data.value)
       .enter()
       .append("circle")
-      .attr("cx", d => xScale(d["pca_features_or"][0]) + margin.left)
-      .attr("cy", d => yScale(d["pca_features_or"][1]) + margin.bottom)
+      .attr("cx", d => xScale(d[feature_column][0]) + margin.left)
+      .attr("cy", d => yScale(d[feature_column][1]) + margin.bottom)
       .attr("r", d => (xScale(0.01) - xScale(0)) / 2)
       .attr("fill", "steelblue")
 
