@@ -38,7 +38,7 @@ print("finished!")
 
 # saving into csv
 df = pd.DataFrame(rows)
-df.to_csv("/embedding_data.csv", index=False)
+df.to_csv(f"{MODEL_DIR}/embedding_data.csv", index=False)
 
 print()
 print(f"saved ground_truth, features, predictions, binarized_predictions as {MODEL_DIR}/embedding_data.csv")
