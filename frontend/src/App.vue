@@ -1,6 +1,21 @@
 <script setup>
+import axios from "axios"
 import Scatterplot from "@/components/Scatterplot.vue"
 import { ref } from "vue"
+
+// data
+const data = ref()
+
+const ax = axios.create({
+  baseURL: "http://localhost:5000",
+  timeout: 1000
+})
+
+ax.get("data/")
+    .then(res => {
+      data.value = res.data
+      console.log(data.value)
+    })
 
 // menu refs
 const useDGrid = ref(true)
@@ -11,6 +26,8 @@ const dimensionalityReductionOptions = ref([
   { name: "t-SNE", value: "tsne" }
 ])
 const dimensionalityReduction = ref("pca")
+
+const highlightClass = ref(-1)
 </script>
 
 <template>
@@ -29,14 +46,28 @@ const dimensionalityReduction = ref("pca")
             :options="dimensionalityReductionOptions"
             option-label="name"
             option-value="value"
+            :allow-empty="false"
         />
+      </div>
+
+      <div>
+        <div class="radio-button">
+          <RadioButton v-model="highlightClass" :input-id="-1" :value="-1" />
+          <label :for="-1">Keine Klasse</label>
+        </div>
+        <div class="radio-button" v-for="(item, index) in data[0]['ground_truth']" :key="index">
+          <RadioButton v-model="highlightClass" :input-id="index" :value="index" />
+          <label :for="index">Klasse {{ index }}</label>
+        </div>
       </div>
 
     </div>
 
     <Scatterplot
+        :data="data"
         :use-d-grid="useDGrid"
         :dimensionality-reduction="dimensionalityReduction"
+        :highlight-class="highlightClass"
     />
 
   </div>
@@ -65,5 +96,12 @@ const dimensionalityReduction = ref("pca")
   display: flex;
   align-items: center;
   gap: 0.5rem;
+}
+
+.radio-button {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin: 0.5rem 0;
 }
 </style>

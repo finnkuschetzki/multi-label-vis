@@ -1,31 +1,25 @@
 <script setup>
-import axios from "axios"
-import { ref, onMounted, watchEffect } from "vue"
 import * as d3 from "d3"
+import { ref, onMounted, watchEffect } from "vue"
 
 const props = defineProps({
+  data: {
+    type: Array,
+    required: true
+  },
   useDGrid: {
     type: Boolean,
     required: true
   },
   dimensionalityReduction: {
-
+    type: String,
+    required: true
+  },
+  highlightClass: {
+    type: Number,
+    required: true
   }
 })
-
-// data
-const data = ref()
-
-const ax = axios.create({
-  baseURL: "http://localhost:5000",
-  timeout: 1000
-})
-
-ax.get("data/")
-    .then(res => {
-      data.value = res.data
-      console.log(data.value)
-    })
 
 // chart
 const chart = ref()
@@ -63,13 +57,16 @@ function updateChart() {
   if (props.useDGrid) feature_column += "_or"
 
   svg.selectAll("circle")
-      .data(data.value)
+      .data(props.data)
       .enter()
       .append("circle")
       .attr("cx", d => xScale(d[feature_column][0]) + margin.left)
       .attr("cy", d => yScale(d[feature_column][1]) + margin.bottom)
       .attr("r", d => (xScale(0.01) - xScale(0)) / 2)
-      .attr("fill", "steelblue")
+      .attr("fill", d => {
+        if (props.highlightClass === -1) return "steelblue"
+        else return d["ground_truth"][props.highlightClass] ? "red" : "steelblue"
+      })
 
 }
 
