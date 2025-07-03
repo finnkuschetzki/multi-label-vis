@@ -1,6 +1,7 @@
 <script setup>
 import * as d3 from "d3"
 import { ref, onMounted, watchEffect } from "vue"
+import { useElementSize } from "@vueuse/core"
 
 const props = defineProps({
   data: {
@@ -21,29 +22,21 @@ const props = defineProps({
   }
 })
 
-// chart
+const container = ref()
 const chart = ref()
 
-function updateChart() {
+const { width, height } = useElementSize(container)
 
+function drawChart() {
   const margin = { top: 25, bottom: 25, left: 25, right: 25 }
-  const size = 700
+  const size = Math.min(width.value, height.value) * 0.9
 
-  d3.select(chart.value).select("svg").remove()  // removing existing chart
+  d3.select(chart.value).select("svg").remove()  // remove existing chart
 
   const svg = d3.select(chart.value).append("svg")
       .attr("width", size)
       .attr("height", size)
       .append("g")
-
-  const outline = svg.append("rect")
-      .attr("x", 0)
-      .attr("y", 0)
-      .attr("width", size)
-      .attr("height", size)
-      .attr("fill", "none")
-      .attr("stroke", "black")
-      .attr("stroke-width", 1)
 
   const xScale = d3.scaleLinear()
       .domain([0,1])
@@ -52,6 +45,15 @@ function updateChart() {
   const yScale = d3.scaleLinear()
       .domain([0,1])
       .range([0, size - margin.top - margin.right])
+
+  const outline = svg.append("rect")
+      .attr("x", 0)
+      .attr("y", 0)
+      .attr("width", size)
+      .attr("height", size)
+      .attr("fill", "none")
+      .attr("stroke", "black")
+      .attr("stroke-width", 3)
 
   let feature_column = `${props.dimensionalityReduction}_features`;
   if (props.useDGrid) feature_column += "_or"
@@ -62,16 +64,18 @@ function updateChart() {
       .append("circle")
       .attr("cx", d => xScale(d[feature_column][0]) + margin.left)
       .attr("cy", d => yScale(d[feature_column][1]) + margin.bottom)
-      .attr("r", d => (xScale(0.01) - xScale(0)) / 2)
+      .attr("r", d => Math.min(
+          (xScale(0.01) - xScale(0)) / 2,
+          (yScale(0.01) - yScale(0)) / 2
+      ))
       .attr("fill", d => {
         if (props.highlightClass === -1) return "steelblue"
         else return d["ground_truth"][props.highlightClass] ? "red" : "steelblue"
       })
-
 }
 
-onMounted(updateChart)
-watchEffect(updateChart)
+onMounted(drawChart)
+watchEffect(drawChart)
 </script>
 
 <template>
