@@ -1,10 +1,23 @@
 <script setup>
+import axios from "axios"
 import * as d3 from "d3"
 import { ref, onMounted, watchEffect } from "vue"
 import { useElementSize } from "@vueuse/core"
 
 import { data } from "@/stores/data.js"
 import * as settings from "@/stores/settings.js"
+
+
+const ax = axios.create({
+  baseURL: "http://localhost:5000",
+  timeout: 1000
+})
+
+ax.get("data/")
+    .then(res => {
+      data.value = res.data
+      console.log(data.value)
+    })
 
 
 const container = ref()
@@ -68,7 +81,11 @@ watchEffect(drawChart)
 <template>
   <div class="chart-container" ref="container">
 
-    <div id="chart" ref="chart"></div>
+    <div v-if="data" id="chart" ref="chart"></div>
+
+    <div v-else class="loading-container">
+      <ProgressSpinner animation-duration=".5s" />
+    </div>
 
   </div>
 </template>
@@ -79,5 +96,11 @@ watchEffect(drawChart)
   display: flex;
   justify-content: center;
   align-items: center;
+}
+
+.loading-container {
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 </style>

@@ -13,6 +13,7 @@ const dimensionalityReductionOptions = ref([
 ])
 
 // standard settings
+data.value = null
 settings.useDGrid.value = true
 settings.dimensionalityReduction.value = "pca"
 settings.highlightClass.value = -1
@@ -36,7 +37,7 @@ settings.highlightClass.value = -1
       />
     </div>
 
-    <div>
+    <div v-if="data">
       <div class="radio-button">
         <RadioButton v-model="settings.highlightClass" :input-id="-1" :value="-1" />
         <label :for="-1">Keine Klasse</label>
