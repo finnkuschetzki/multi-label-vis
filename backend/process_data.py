@@ -1,4 +1,3 @@
-import os
 import time
 import numpy as np
 import pandas as pd
@@ -15,35 +14,24 @@ WIDTH, HEIGHT = 0.01, 0.01  # results in 1 / (0.01 * 0.01) = 10,000 cells in vis
 DELTA = 1.0
 
 
-def process_data():
+def read_csv_with_list_attributes(path, list_attributes):
+    df = pd.read_csv(path)
+    for list_attribute in list_attributes:
+        df[list_attribute] = df[list_attribute].apply(literal_eval)
+    return df
 
-    print("processing data...")
 
+def apply_dimensionality_reduction(in_df):
+    out_df = pd.DataFrame()
+    out_df["ground_truth"] = in_df["ground_truth"].copy()
+    out_df["predictions"] = in_df["predictions"].copy()
+    out_df["binarized_predictions"] = in_df["binarized_predictions"].copy()
 
-    # --- read and process data ---
-
-    in_df = pd.read_csv("../model/output/embedding_data.csv")
-    in_df["ground_truth"] = in_df["ground_truth"].apply(literal_eval)
-    in_df["features"] = in_df["features"].apply(literal_eval)
-    in_df["predictions"] = in_df["predictions"].apply(literal_eval)
-    in_df["binarized_predictions"] = in_df["binarized_predictions"].apply(literal_eval)
     features = np.array(in_df["features"].tolist())
-
     standard_scaler = StandardScaler()
     standardized_features = standard_scaler.fit_transform(features)
 
     min_max_scaler = MinMaxScaler()
-
-
-    # --- prepare data saving ---
-
-    directory = "data"
-    if not os.path.exists(directory):
-        os.makedirs(directory)
-        print(f"created directory: {directory}")
-
-    out_df = in_df.filter(["ground_truth", "predictions", "binarized_predictions"])
-
 
     # --- PCA ---
 
@@ -56,14 +44,8 @@ def process_data():
     scaled_pca_features = min_max_scaler.fit_transform(pca_features)
     out_df["pca_features"] = scaled_pca_features.tolist()
 
-    # overlap removal
-    print("Overlap Removal...")
-    scaled_pca_features_or = DGrid(WIDTH, HEIGHT, DELTA).fit_transform(scaled_pca_features)
-    out_df["pca_features_or"] = scaled_pca_features_or.tolist()
-
     end = time.time()
     print(f"Done (t={end - start:.2f}s)")
-
 
     # --- UMAP ---
 
@@ -76,14 +58,8 @@ def process_data():
     scaled_umap_features = min_max_scaler.fit_transform(umap_features)
     out_df["umap_features"] = scaled_umap_features.tolist()
 
-    # overlap removal
-    print("Overlap Removal...")
-    scaled_umap_features_or = DGrid(WIDTH, HEIGHT, DELTA).fit_transform(scaled_umap_features)
-    out_df["umap_features_or"] = scaled_umap_features_or.tolist()
-
     end = time.time()
     print(f"Done (t={end - start:.2f}s)")
-
 
     # --- t-SNE ---
 
@@ -96,45 +72,25 @@ def process_data():
     scaled_tsne_features = min_max_scaler.fit_transform(tsne_features)
     out_df["tsne_features"] = scaled_tsne_features.tolist()
 
-    # overlap removal
-    print("Overlap Removal...")
-    scaled_tsne_features_or = DGrid(WIDTH, HEIGHT, DELTA).fit_transform(scaled_tsne_features)
-    out_df["tsne_features_or"] = scaled_tsne_features_or.tolist()
-
     end = time.time()
     print(f"Done (t={end - start:.2f}s)")
 
-
-    # --- saving data ---
-
-    out_df.to_csv('data/dimensionality_reduction.csv', index=False)
+    return out_df
 
 
-def get_data_as_json():
+def apply_overlap_removal(in_df: pd.DataFrame):
+    out_df = in_df.copy()
 
-    df = pd.read_csv("data/dimensionality_reduction.csv")
+    pca_features = np.array(in_df["pca_features"].tolist())
+    pca_feature_or = DGrid(WIDTH, HEIGHT, DELTA).fit_transform(pca_features)
+    out_df["pca_features_or"] = pca_feature_or.tolist()
 
-    df["ground_truth"] = df["ground_truth"].apply(literal_eval)
-    df["predictions"] = df["predictions"].apply(literal_eval)
-    df["binarized_predictions"] = df["binarized_predictions"].apply(literal_eval)
+    umap_features = np.array(in_df["umap_features"].tolist())
+    umap_feature_or = DGrid(WIDTH, HEIGHT, DELTA).fit_transform(umap_features)
+    out_df["umap_features_or"] = umap_feature_or.tolist()
 
-    df["pca_features"] = df["pca_features"].apply(literal_eval)
-    df["pca_features_or"] = df["pca_features_or"].apply(literal_eval)
+    tsne_features = np.array(in_df["tsne_features"].tolist())
+    tsne_feature_or = DGrid(WIDTH, HEIGHT, DELTA).fit_transform(tsne_features)
+    out_df["tsne_features_or"] = tsne_feature_or.tolist()
 
-    df["umap_features"] = df["umap_features"].apply(literal_eval)
-    df["umap_features_or"] = df["umap_features_or"].apply(literal_eval)
-
-    df["tsne_features"] = df["tsne_features"].apply(literal_eval)
-    df["tsne_features_or"] = df["tsne_features_or"].apply(literal_eval)
-
-    return df.to_json(orient="records")
-
-
-__all__ = [
-    "process_data",
-    "get_data_as_json"
-]
-
-
-if __name__ == "__main__":
-    process_data()
+    return out_df

@@ -31,7 +31,7 @@ const highlightClass = ref(-1)
 </script>
 
 <template>
-  <div class="main-container">
+  <div v-if="data" class="main-container">
 
     <div class="menu-container">
 
@@ -71,12 +71,20 @@ const highlightClass = ref(-1)
     />
 
   </div>
+  <div v-else class="main-container loading">
+    <ProgressSpinner animation-duration=".5s" />
+  </div>
 </template>
 
 <style scoped>
 .main-container {
   display: flex;
   flex-wrap: wrap;
+}
+
+.loading {
+  align-items: center;
+  justify-content: center;
 }
 
 .menu-container {

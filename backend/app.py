@@ -1,29 +1,27 @@
-import os
 from flask import Flask
 from flask_cors import CORS
 
 from process_data import *
 
 
-# checking for dimensionality reduction data
-if not os.path.exists("data/dimensionality_reduction.csv"):
-    print()
-    process_data()  # generates and saves dimensionality reduction data
-    print()
+df = read_csv_with_list_attributes("../model/output/embedding_data.csv", ["ground_truth", "features", "predictions", "binarized_predictions"])
+df = apply_dimensionality_reduction(df)
+
 
 app = Flask(__name__)
 CORS(app, origins=["http://localhost:5173"])
 
 
-@app.route('/')
-def hello_world():  # put application's code here
-    return 'Hello World!'
+@app.route("/")
+def hello_world():
+    return "Hello World!"
 
 
 @app.route("/data/")
 def data():
-    return get_data_as_json()
+    or_df = apply_overlap_removal(df)
+    return or_df.to_json(orient="records")
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     app.run()
