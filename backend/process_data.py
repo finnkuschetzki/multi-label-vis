@@ -78,18 +78,34 @@ def apply_dimensionality_reduction(in_df):
     return out_df
 
 
-def apply_overlap_removal(in_df: pd.DataFrame):
+def apply_overlap_removal(in_df: pd.DataFrame, x_factor=1, y_factor=1):
+
+    def scale_independently(data):
+        dim1 = data[:, 0].reshape(-1, 1)
+        dim2 = data[:, 1].reshape(-1, 1)
+
+        scaler1 = MinMaxScaler(feature_range=(0, x_factor))
+        scaler2 = MinMaxScaler(feature_range=(0, y_factor))
+
+        scaled_dim1 = scaler1.fit_transform(dim1)
+        scaled_dim2 = scaler2.fit_transform(dim2)
+
+        return np.hstack((scaled_dim1, scaled_dim2))
+
     out_df = in_df.copy()
 
     pca_features = np.array(in_df["pca_features"].tolist())
+    pca_features = scale_independently(pca_features)
     pca_feature_or = DGrid(WIDTH, HEIGHT, DELTA).fit_transform(pca_features)
     out_df["pca_features_or"] = pca_feature_or.tolist()
 
     umap_features = np.array(in_df["umap_features"].tolist())
+    umap_features = scale_independently(umap_features)
     umap_feature_or = DGrid(WIDTH, HEIGHT, DELTA).fit_transform(umap_features)
     out_df["umap_features_or"] = umap_feature_or.tolist()
 
     tsne_features = np.array(in_df["tsne_features"].tolist())
+    tsne_features = scale_independently(tsne_features)
     tsne_feature_or = DGrid(WIDTH, HEIGHT, DELTA).fit_transform(tsne_features)
     out_df["tsne_features_or"] = tsne_feature_or.tolist()
 
