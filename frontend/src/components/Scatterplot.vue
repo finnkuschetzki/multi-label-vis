@@ -1,98 +1,109 @@
 <script setup>
 import axios from "axios"
 import * as d3 from "d3"
-import { ref, onMounted, watch, watchEffect } from "vue"
+import { ref, onMounted, nextTick, watchEffect } from "vue"
 import { useElementSize } from "@vueuse/core"
 
 import { data } from "@/stores/data.js"
 import * as settings from "@/stores/settings.js"
 
 
-// creating axios instance
 const ax = axios.create({
   baseURL: "http://localhost:5000",
   timeout: 1000
 })
 
 
-// sizing and data request
 const container = ref()
-const { width: containerWidth, height: containerHeight } = useElementSize(container)
-let isInitialized = false
-
 const chart = ref()
-const chart_width = ref(NaN)
-const chart_height = ref(NaN)
-const factorX = ref(1)
-const factorY = ref(1)
 
-watch([containerWidth, containerHeight], ([newWidth, newHeight]) => {
-  if (newWidth === 0 && newHeight === 0) return
+let chart_width, chart_height, factorX, factorY
 
-  if (!isInitialized) {
-    isInitialized = true
-    chart_width.value = newWidth * 0.9
-    chart_height.value = newHeight * 0.9
-    console.log(`initialized width, height to values ${newWidth}, ${newHeight}`)
+const margin = { top: 25, bottom: 25, left: 25, right: 25 }
+let svg, xScale, yScale, contentGroup, zoom
 
-    factorX.value = chart_width.value / chart_height.value
-    factorY.value = 1
-    console.log(`set factorX, factorY to values ${factorX.value}, ${factorY.value}`)
 
-    ax.get("data/", {
-      params: {
-        "factorX": factorX.value,
-        "factorY": factorY.value
-      }
-    }).then(res => {
-          data.value = res.data
-          console.log(data.value)
-        })
-  } else {
-    console.log("resize")
-  }
+onMounted(async () => {
+  await nextTick()
+
+  // getting container size and calculating factors
+  const { width, height } = useElementSize(container)
+  chart_width = width.value * 0.9
+  chart_height = height.value * 0.9
+  factorX = chart_width / chart_height
+  factorY = 1
+
+  // requesting data
+  const res = await ax.get("data/", {
+    params: {
+      "factorX": factorX,
+      "factorY": factorY
+    }
+  })
+
+  data.value = res.data
+  console.log(data.value)
+
+  await nextTick()
+
+  // chart setup and watch update
+  setupChart()
+  watchEffect(updateChart)
 })
 
 
-function drawChart() {
-  if (isNaN(chart_width.value) && isNaN(chart_height.value)) return
+function setupChart() {
+  console.log("chart setup")
 
-  const margin = { top: 25, bottom: 25, left: 25, right: 25 }
-  const width = chart_width.value
-  const height = chart_height.value
-
-  d3.select(chart.value).select("svg").remove()  // remove existing chart
-
-  const svg = d3.select(chart.value).append("svg")
-      .attr("width", width)
-      .attr("height", height)
+  // chart base setup
+  svg = d3.select(chart.value).append("svg")
+      .attr("width", chart_width)
+      .attr("height", chart_height)
       .append("g")
 
-  const xScale = d3.scaleLinear()
-      .domain([0, factorX.value])
-      .range([0, width - margin.left - margin.right])
+  xScale = d3.scaleLinear()
+      .domain([0, factorX])
+      .range([0, chart_width - margin.left - margin.right])
 
-  const yScale = d3.scaleLinear()
-      .domain([0, factorY.value])
-      .range([0, height - margin.top - margin.right])
+  yScale = d3.scaleLinear()
+      .domain([0, factorY])
+      .range([0, chart_height - margin.top - margin.right])
 
-  const outline = svg.append("rect")
+  svg.append("rect")  // bounding rect (outline and events)
       .attr("x", 0)
       .attr("y", 0)
-      .attr("width", width)
-      .attr("height", height)
+      .attr("width", chart_width)
+      .attr("height", chart_height)
       .attr("fill", "none")
       .attr("stroke", "black")
       .attr("stroke-width", 3)
       .attr("pointer-events", "all")
 
-  const zoomLayer = svg.append("g")
-      .attr("class", "zoom-layer")
+  contentGroup = svg.append("g")  // all chart contents inside
+
+  // zooming
+  zoom = d3.zoom()
+      .scaleExtent([1, 10])
+      .translateExtent([[0, 0], [chart_width, chart_height]])
+      .on("zoom", (event) => {
+        contentGroup.attr("transform", event.transform)
+      })
+
+  svg.call(zoom)
+}
+
+
+function updateChart() {
+  console.log("chart update")
 
   let feature_column = `${settings.dimensionalityReduction.value}_features`;
   if (settings.useDGrid.value) feature_column += "_or"
 
-  zoomLayer.selectAll("circle")
+  // removing old glyphs
+  contentGroup.selectAll("circle").remove()
+
+  // adding new glyphs
+  contentGroup.selectAll("circle")
       .data(data.value)
       .enter()
       .append("circle")
@@ -106,22 +117,7 @@ function drawChart() {
         if (settings.highlightClass.value === -1) return "steelblue"
         else return d["ground_truth"][settings.highlightClass.value] ? "red" : "steelblue"
       })
-
-  // zooming
-  const zoom = d3.zoom()
-      .scaleExtent([1, 10])
-      .translateExtent([[0, 0], [width, height]])
-      .on("zoom", (event) => {
-        zoomLayer.attr("transform", event.transform)
-        console.log(event.transform)
-      })
-
-  svg.call(zoom)
 }
-
-
-onMounted(drawChart)
-watchEffect(drawChart)
 </script>
 
 <template>
