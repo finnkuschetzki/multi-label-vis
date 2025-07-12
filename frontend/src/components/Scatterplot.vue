@@ -84,11 +84,15 @@ function drawChart() {
       .attr("fill", "none")
       .attr("stroke", "black")
       .attr("stroke-width", 3)
+      .attr("pointer-events", "all")
+
+  const zoomLayer = svg.append("g")
+      .attr("class", "zoom-layer")
 
   let feature_column = `${settings.dimensionalityReduction.value}_features`;
   if (settings.useDGrid.value) feature_column += "_or"
 
-  svg.selectAll("circle")
+  zoomLayer.selectAll("circle")
       .data(data.value)
       .enter()
       .append("circle")
@@ -102,6 +106,17 @@ function drawChart() {
         if (settings.highlightClass.value === -1) return "steelblue"
         else return d["ground_truth"][settings.highlightClass.value] ? "red" : "steelblue"
       })
+
+  // zooming
+  const zoom = d3.zoom()
+      .scaleExtent([1, 10])
+      .translateExtent([[0, 0], [width, height]])
+      .on("zoom", (event) => {
+        zoomLayer.attr("transform", event.transform)
+        console.log(event.transform)
+      })
+
+  svg.call(zoom)
 }
 
 
