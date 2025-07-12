@@ -54,9 +54,8 @@ watch([containerWidth, containerHeight], ([newWidth, newHeight]) => {
 })
 
 
-// drawing chart
 function drawChart() {
-  if (!isNaN(chart_width) && !isNaN(chart_height)) return
+  if (isNaN(chart_width.value) && isNaN(chart_height.value)) return
 
   const margin = { top: 25, bottom: 25, left: 25, right: 25 }
   const width = chart_width.value
