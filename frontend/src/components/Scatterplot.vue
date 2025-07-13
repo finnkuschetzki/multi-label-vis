@@ -100,23 +100,44 @@ function updateChart() {
   if (settings.useDGrid.value) feature_column += "_or"
 
   // removing old glyphs
-  contentGroup.selectAll("circle").remove()
+  contentGroup.selectAll(".glyph-outline").remove()
 
   // adding new glyphs
-  contentGroup.selectAll("circle")
+  const numClasses = data.value[0]["ground_truth"].length
+  console.log(numClasses)
+  const size = Math.min(
+      (xScale(0.01) - xScale(0)),
+      (yScale(0.01) - yScale(0))
+  ) * 0.9  // todo scale size to prevent overlaps (caused by stroke width)
+
+  contentGroup.selectAll()
       .data(data.value)
       .enter()
-      .append("circle")
-      .attr("cx", d => xScale(d[feature_column][0]) + margin.left)
-      .attr("cy", d => yScale(d[feature_column][1]) + margin.bottom)
-      .attr("r", Math.min(
-          (xScale(0.01) - xScale(0)) / 2,
-          (yScale(0.01) - yScale(0)) / 2
-      ))
-      .attr("fill", d => {
-        if (settings.highlightClass.value === -1) return "steelblue"
-        else return d["ground_truth"][settings.highlightClass.value] ? "red" : "steelblue"
+      .append("path")
+      .attr("class", "glyph-outline")
+      .attr("d", d => {
+        const cx = xScale(d[feature_column][0]) + margin.left
+        const cy = yScale(d[feature_column][1]) + margin.bottom
+
+        const mx = cx + size/2
+        const my = cy + size/2
+
+        const initialRadians = Math.PI / 2
+        const classStep = (2 * Math.PI) / numClasses
+
+        let pathD = `M${mx + Math.cos(initialRadians) * size/2},${my + Math.sin(initialRadians) * size/2}`
+        for (let i = 1; i < numClasses; i++) {
+          const px = mx + Math.cos(initialRadians + classStep * i) * size/2
+          const py = my + Math.sin(initialRadians + classStep * i) * size/2
+          pathD += `L${px},${py}`
+        }
+        pathD += `Z`
+
+        return pathD
       })
+      .attr("stroke", "black")
+      .attr("stroke-width", .5)
+      .attr("fill", "none")
 }
 </script>
 
