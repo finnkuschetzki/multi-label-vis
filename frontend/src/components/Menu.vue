@@ -16,7 +16,6 @@ const dimensionalityReductionOptions = ref([
 data.value = null
 settings.useDGrid.value = true
 settings.dimensionalityReduction.value = "pca"
-settings.highlightClass.value = -1
 </script>
 
 <template>
@@ -35,17 +34,6 @@ settings.highlightClass.value = -1
           option-value="value"
           :allow-empty="false"
       />
-    </div>
-
-    <div v-if="data">
-      <div class="radio-button">
-        <RadioButton v-model="settings.highlightClass" :input-id="-1" :value="-1" />
-        <label :for="-1">Keine Klasse</label>
-      </div>
-      <div class="radio-button" v-for="(_, index) in data[0]['ground_truth']" :key="index">
-        <RadioButton v-model="settings.highlightClass" :input-id="index" :value="index" />
-        <label :for="index">Klasse {{ index }}</label>
-      </div>
     </div>
 
   </div>
@@ -69,12 +57,5 @@ settings.highlightClass.value = -1
   display: flex;
   align-items: center;
   gap: 0.5rem;
-}
-
-.radio-button {
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-  margin: 0.5rem 0;
 }
 </style>
