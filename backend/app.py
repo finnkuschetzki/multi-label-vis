@@ -1,4 +1,4 @@
-from flask import Flask, request
+from flask import Flask, request, jsonify
 from flask_cors import CORS
 
 from process_data import *
@@ -6,6 +6,8 @@ from process_data import *
 
 df = read_csv_with_list_attributes("../model/output/embedding_data.csv", ["ground_truth", "features", "predictions", "binarized_predictions"])
 df = apply_dimensionality_reduction(df)
+
+class_info_df = pd.read_csv("../model/output/class_info.csv")
 
 
 app = Flask(__name__)
@@ -27,7 +29,15 @@ def data():
     else:
         or_df = apply_overlap_removal(df, x_factor, y_factor)
 
-    return or_df.to_json(orient="records")
+    data_points = or_df.to_dict(orient="records")
+    class_info = class_info_df.to_dict(orient="records")
+
+    response = {
+        "data_points": data_points,
+        "class_info": class_info
+    }
+
+    return jsonify(response)
 
 
 if __name__ == "__main__":

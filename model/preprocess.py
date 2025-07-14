@@ -24,6 +24,12 @@ train_categories = [cat for cat in categories if cat["id"] in CATEGORY_IDS]
 num_coco_classes = len(categories)
 num_train_classes = len(CATEGORY_IDS)
 
+# map category_id to category_name
+category_id_to_category_name = {
+    category["id"]: category["name"]
+    for category in train_categories
+}
+
 # map category_id to multi_hot index
 category_id_to_multi_hot_index = {
     category["id"]: multi_hot_index
@@ -80,6 +86,7 @@ __all__ = [
     "coco_train",
     "coco_val",
     "num_train_classes",
+    "category_id_to_category_name",
     "multi_hot_index_to_category_id",
     "multi_hot_index_to_category_name",
     "train_image_infos",

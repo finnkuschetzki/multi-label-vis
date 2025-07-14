@@ -2,8 +2,10 @@ import pandas as pd
 from keras import models
 
 from _command_line_tools import *
+from preprocess import *
 from pipeline import *
 
+# --- embedding data ---
 
 MODEL_DIR = get_model_dir()
 
@@ -35,10 +37,23 @@ for batch_images, batch_labels in val_dataset:
 
 print("finished!")
 
-
 # saving into csv
 df = pd.DataFrame(rows)
 df.to_csv(f"{MODEL_DIR}/embedding_data.csv", index=False)
 
 print()
 print(f"saved ground_truth, features, predictions, binarized_predictions as {MODEL_DIR}/embedding_data.csv")
+
+
+# --- class info ---
+
+rows = []
+for id_, name in category_id_to_category_name.items():
+    rows.append({
+        "id": id_,
+        "name": name,
+    })
+
+# saving into csv
+class_df = pd.DataFrame(rows)
+class_df.to_csv(f"{MODEL_DIR}/class_info.csv", index=False)

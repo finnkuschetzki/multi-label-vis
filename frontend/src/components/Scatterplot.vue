@@ -3,7 +3,7 @@ import axios from "axios"
 import { ref, onMounted, nextTick, watchEffect } from "vue"
 import { useElementSize } from "@vueuse/core"
 
-import { data } from "@/stores/data.js"
+import { data, classInfo } from "@/stores/data.js"
 
 import { setupChart, updateChart } from "@/chart/base.js"
 
@@ -38,7 +38,8 @@ onMounted(async () => {
     }
   })
 
-  data.value = res.data
+  data.value = res.data["data_points"]
+  classInfo.value = res.data["class_info"]
   console.log(data.value)
 
   await nextTick()
