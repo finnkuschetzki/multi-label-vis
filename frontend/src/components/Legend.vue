@@ -52,12 +52,10 @@ defineExpose(isInitialized)
   flex-direction: column;
   align-items: center;
   margin-top: 0.75rem;
-  margin-bottom: 0.75rem;
-  border-left: 2px solid black;
 }
 
 .legend-container > * {
-  margin: 0.75rem 1.5rem;
+  margin: .5rem .25rem;
 }
 
 .class-item {

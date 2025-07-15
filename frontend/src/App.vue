@@ -15,9 +15,12 @@ const isLegendInitialized = useTemplateRef("isLegendInitialized")
 <template>
   <div class="main-container">
 
-    <Menu />
+    <div class="sidebar">
+      <Menu />
+      <Legend ref="isLegendInitialized" />
+    </div>
+
     <Scatterplot v-if="isLegendInitialized" />
-    <Legend ref="isLegendInitialized" />
 
   </div>
 </template>
@@ -26,5 +29,9 @@ const isLegendInitialized = useTemplateRef("isLegendInitialized")
 .main-container {
   display: flex;
   flex-wrap: wrap;
+}
+
+.sidebar {
+  margin: .75rem;
 }
 </style>

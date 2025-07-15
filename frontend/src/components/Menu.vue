@@ -21,9 +21,12 @@ settings.dimensionalityReduction.value = "pca"
 </script>
 
 <template>
-  <Button icon="pi pi-bars" @click="visible = true" />
 
-  <Drawer v-model:visible="visible" header="Settings">
+  <div class="button-container">
+    <Button icon="pi pi-bars" class="menu-button" @click="visible = true" />
+  </div>
+
+  <Drawer v-model:visible="visible" position="left" header="Settings">
     <div class="menu-container">
 
       <div class="toggle-switch">
@@ -46,6 +49,14 @@ settings.dimensionalityReduction.value = "pca"
 </template>
 
 <style scoped>
+.button-container {
+  display: flex;
+}
+
+.button-container > Button {
+  flex: 1;
+}
+
 .menu-container {
   display: flex;
   flex-direction: column;

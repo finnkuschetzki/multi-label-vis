@@ -19,8 +19,8 @@ onMounted(async () => {
 
   // getting container size and calculating factors
   const { width, height } = useElementSize(container)
-  chart_width = width.value * 0.9
-  chart_height = height.value * 0.9
+  chart_width = width.value * 0.95
+  chart_height = height.value * 0.95
   factorX = chart_width / chart_height
   factorY = 1
 
