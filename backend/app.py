@@ -19,6 +19,11 @@ def hello_world():
     return "Hello World!"
 
 
+@app.route("/class-info/")
+def class_info():
+    return class_info_df.to_json(orient="records")
+
+
 @app.route("/data/")
 def data():
     x_factor = float(request.args.get("factorX"))
@@ -29,15 +34,7 @@ def data():
     else:
         or_df = apply_overlap_removal(df, x_factor, y_factor)
 
-    data_points = or_df.to_dict(orient="records")
-    class_info = class_info_df.to_dict(orient="records")
-
-    response = {
-        "data_points": data_points,
-        "class_info": class_info
-    }
-
-    return jsonify(response)
+    return or_df.to_json(orient="records")
 
 
 if __name__ == "__main__":
