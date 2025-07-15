@@ -5,6 +5,8 @@ import { data } from "@/stores/data.js"
 import * as settings from "@/stores/settings.js"
 
 
+const visible = ref()
+
 // options
 const dimensionalityReductionOptions = ref([
   { name: "PCA", value: "pca" },
@@ -19,24 +21,28 @@ settings.dimensionalityReduction.value = "pca"
 </script>
 
 <template>
-  <div class="menu-container">
+  <Button icon="pi pi-bars" @click="visible = true" />
 
-    <div class="toggle-switch">
-      <label for="d-grid-toggle">DGrid</label>
-      <ToggleSwitch v-model="settings.useDGrid" inputId="d-grid-toggle" />
+  <Drawer v-model:visible="visible" header="Settings">
+    <div class="menu-container">
+
+      <div class="toggle-switch">
+        <label for="d-grid-toggle">DGrid</label>
+        <ToggleSwitch v-model="settings.useDGrid" inputId="d-grid-toggle" />
+      </div>
+
+      <div>
+        <SelectButton
+            v-model="settings.dimensionalityReduction"
+            :options="dimensionalityReductionOptions"
+            option-label="name"
+            option-value="value"
+            :allow-empty="false"
+        />
+      </div>
+
     </div>
-
-    <div>
-      <SelectButton
-          v-model="settings.dimensionalityReduction"
-          :options="dimensionalityReductionOptions"
-          option-label="name"
-          option-value="value"
-          :allow-empty="false"
-      />
-    </div>
-
-  </div>
+  </Drawer>
 </template>
 
 <style scoped>
@@ -46,7 +52,6 @@ settings.dimensionalityReduction.value = "pca"
   align-items: center;
   margin-top: 0.75rem;
   margin-bottom: 0.75rem;
-  border-right: 2px solid black;
 }
 
 .menu-container > * {
