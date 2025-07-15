@@ -4,7 +4,7 @@ import { useElementSize } from "@vueuse/core"
 
 import httpClient from "@/httpClient/httpClient.js"
 
-import { data, classInfo } from "@/stores/data.js"
+import { data } from "@/stores/data.js"
 import { setupChart, updateChart } from "@/chart/base.js"
 
 
@@ -32,8 +32,7 @@ onMounted(async () => {
     }
   })
 
-  data.value = res.data["data_points"]
-  classInfo.value = res.data["class_info"]
+  data.value = res.data
   console.log(data.value)
 
   await nextTick()
