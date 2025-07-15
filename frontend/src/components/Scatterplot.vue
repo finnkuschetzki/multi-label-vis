@@ -1,17 +1,11 @@
 <script setup>
-import axios from "axios"
 import { ref, onMounted, nextTick, watchEffect } from "vue"
 import { useElementSize } from "@vueuse/core"
 
+import httpClient from "@/httpClient/httpClient.js"
+
 import { data, classInfo } from "@/stores/data.js"
-
 import { setupChart, updateChart } from "@/chart/base.js"
-
-
-const ax = axios.create({
-  baseURL: "http://localhost:5000",
-  timeout: 1000
-})
 
 
 const container = ref()
@@ -31,7 +25,7 @@ onMounted(async () => {
   factorY = 1
 
   // requesting data
-  const res = await ax.get("data/", {
+  const res = await httpClient.get("data/", {
     params: {
       "factorX": factorX,
       "factorY": factorY
