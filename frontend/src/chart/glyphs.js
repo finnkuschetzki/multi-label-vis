@@ -118,7 +118,7 @@ function drawGlyphFillsBinary(contentGroup, segmentData) {
         .attr("d", s => {
             let d = ``
 
-            // segment fills
+            // segment fill
             d += `M${s.centerPoint[0]},${s.centerPoint[1]}`
             d += `L${s.outerPoints[0][0]},${s.outerPoints[0][1]}`
             d += `L${s.outerPoints[1][0]},${s.outerPoints[1][1]}`
@@ -131,11 +131,42 @@ function drawGlyphFillsBinary(contentGroup, segmentData) {
 }
 
 
+function drawGlyphFillsPartial(contentGroup, segmentData) {
+    contentGroup.selectAll(".glyph-segment-fills")
+        .data(segmentData)
+        .enter()
+        .append("path")
+        .attr("class", "glyph-segment-fills")
+        .attr("d", s => {
+            // vectors from center point to outer points
+            const vec0 = [s.outerPoints[0][0] - s.centerPoint[0], s.outerPoints[0][1] - s.centerPoint[1]]
+            const vec1 = [s.outerPoints[1][0] - s.centerPoint[0], s.outerPoints[1][1] - s.centerPoint[1]]
+
+            // partial fill points
+            const fillPoint0 = [s.centerPoint[0] + s.prediction * vec0[0], s.centerPoint[1] + s.prediction * vec0[1]]
+            const fillPoint1 = [s.centerPoint[0] + s.prediction * vec1[0], s.centerPoint[1] + s.prediction * vec1[1]]
+
+            let d = ``
+
+            // segment fill
+            d += `M${s.centerPoint[0]},${s.centerPoint[1]}`
+            d += `L${fillPoint0[0]},${fillPoint0[1]}`
+            d += `L${fillPoint1[0]},${fillPoint1[1]}`
+            d += `Z`
+
+            return d
+        })
+        .attr("stroke", "none")
+        // todo cutoff at 0.1 prediction to increase performance of web app
+        .attr("fill", s => s.prediction > 0.1 ? tableau20[s.classIndex] : "none")
+}
+
+
 
 /* FULL GLYPHS */
 
 
-export function drawStandardGlyphs(contentGroup, xScale, yScale, feature_column) {
+export function drawBinaryGlyphs(contentGroup, xScale, yScale, feature_column) {
     const { glyphData, segmentData } = calculateGlyphData(xScale, yScale, feature_column)
 
     // removing old glyphs
@@ -143,6 +174,20 @@ export function drawStandardGlyphs(contentGroup, xScale, yScale, feature_column)
 
     // segment fills
     drawGlyphFillsBinary(contentGroup, segmentData)
+
+    // glyph lines (outline and segment borders)
+    drawGlyphLines(contentGroup, glyphData)
+}
+
+
+export function drawPartialFillGlyphs(contentGroup, xScale, yScale, feature_column) {
+    const { glyphData, segmentData } = calculateGlyphData(xScale, yScale, feature_column)
+
+    // removing old glyphs
+    clearGlyphs(contentGroup)
+
+    // segment fills
+    drawGlyphFillsPartial(contentGroup, segmentData)
 
     // glyph lines (outline and segment borders)
     drawGlyphLines(contentGroup, glyphData)

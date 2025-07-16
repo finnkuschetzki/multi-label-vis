@@ -8,16 +8,21 @@ import * as settings from "@/stores/settings.js"
 const visible = ref()
 
 // options
-const dimensionalityReductionOptions = ref([
+const dimensionalityReductionOptions = [
   { name: "PCA", value: "pca" },
   { name: "UMAP", value: "umap" },
   { name: "t-SNE", value: "tsne" }
-])
+]
+const glyphTypeOptions = [
+  { name: "Binary", value: "binary" },
+  { name: "Partial Fill", value: "partialFill" }
+]
 
 // standard settings
 data.value = null
 settings.useDGrid.value = true
 settings.dimensionalityReduction.value = "pca"
+settings.glyphType.value = "binary"
 </script>
 
 <template>
@@ -41,6 +46,16 @@ settings.dimensionalityReduction.value = "pca"
             option-label="name"
             option-value="value"
             :allow-empty="false"
+        />
+      </div>
+
+      <div>
+        <SelectButton
+          v-model="settings.glyphType"
+          :options="glyphTypeOptions"
+          option-label="name"
+          option-value="value"
+          :allow-empty="false"
         />
       </div>
 
