@@ -32,7 +32,13 @@ settings.glyphType.value = "binary"
     <Button icon="pi pi-bars" class="menu-button" @click="visible = true" />
   </div>
 
-  <Drawer v-model:visible="visible" position="left" header="Settings">
+  <Drawer v-model:visible="visible" position="left" header="Settings"
+      :pt="{
+        root: {
+          style: { width: 'auto', maxWidth: 'none' }
+        }
+      }"
+  >
     <div class="menu-container">
 
       <div class="toggle-switch">
