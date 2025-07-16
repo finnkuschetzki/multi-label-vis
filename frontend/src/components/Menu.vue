@@ -15,7 +15,8 @@ const dimensionalityReductionOptions = [
 ]
 const glyphTypeOptions = [
   { name: "Binary", value: "binary" },
-  { name: "Partial Fill", value: "partialFill" }
+  { name: "Partial Fill", value: "partialFill" },
+  { name: "Whisker", value: "whisker" }
 ]
 
 // standard settings

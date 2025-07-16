@@ -1,8 +1,8 @@
 import * as d3 from "d3"
 
-import * as settings from "@/stores/settings.js";
-import { margin } from "@/chart/settings.js";
-import { drawBinaryGlyphs, drawPartialFillGlyphs } from "@/chart/glyphs.js";
+import * as settings from "@/stores/settings.js"
+import { margin } from "@/chart/settings.js"
+import { drawBinaryGlyphs, drawPartialFillGlyphs, drawWhiskerGlyphs } from "@/chart/glyphs.js"
 
 
 let svg, xScale, yScale, contentGroup, zoom
@@ -61,6 +61,9 @@ export function updateChart() {
             break
         case "partialFill":
             drawPartialFillGlyphs(contentGroup, xScale, yScale, feature_column)
+            break
+        case "whisker":
+            drawWhiskerGlyphs(contentGroup, xScale, yScale, feature_column)
             break
     }
 }

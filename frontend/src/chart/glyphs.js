@@ -76,6 +76,7 @@ function calculateGlyphData(xScale, yScale, featureColumn) {
 function clearGlyphs(contentGroup) {
     contentGroup.selectAll(".glyph-lines").remove()
     contentGroup.selectAll(".glyph-segment-fills").remove()
+    contentGroup.selectAll(".glyph-whiskers").remove()
 }
 
 
@@ -158,7 +159,57 @@ function drawGlyphFillsPartial(contentGroup, segmentData) {
         })
         .attr("stroke", "none")
         // todo cutoff at 0.1 prediction to increase performance of web app
-        .attr("fill", s => s.prediction > 0.1 ? tableau20[s.classIndex] : "none")
+        .attr("fill", s => s.prediction >= 0.1 ? tableau20[s.classIndex] : "none")
+}
+
+
+function drawGlyphWhiskers(contentGroup, segmentData) {
+    contentGroup.selectAll(".glyph-whiskers")
+        .data(segmentData)
+        .enter()
+        .append("path")
+        .attr("class", "glyph-whiskers")
+        .attr("d", s => {
+            // todo cutoff at 0.1 prediction to increase performance of web app
+            if (s.prediction >= 0.1) {
+                // relative vector from outerPoint 0 to outerPoint 1
+                const relOuterVec = [
+                    s.outerPoints[1][0] - s.outerPoints[0][0],
+                    s.outerPoints[1][1] - s.outerPoints[0][1]
+                ]
+
+                // relative vector from center point to outerPoint 0
+                const relOuterPoint0Vec = [
+                    s.outerPoints[0][0] - s.centerPoint[0],
+                    s.outerPoints[0][1] - s.centerPoint[1]
+                ]
+
+                // relative vector from center point to midpoint between outerPoints
+                const relMidpointVec = [
+                    relOuterPoint0Vec[0] + relOuterVec[0]/2,
+                    relOuterPoint0Vec[1] + relOuterVec[1]/2
+                ]
+
+                // absolute vector to whisker (outer) endpoint
+                const whiskerEndpointVec = [
+                    s.centerPoint[0] + s.prediction * relMidpointVec[0],
+                    s.centerPoint[1] + s.prediction * relMidpointVec[1]
+                ]
+
+                let d = ``
+
+                // whisker
+                d += `M${s.centerPoint[0]},${s.centerPoint[1]}`
+                d += `L${whiskerEndpointVec[0]},${whiskerEndpointVec[1]}`
+
+                return d
+            } else {
+                return ""
+            }
+        })
+        .attr("stroke", "black")
+        .attr("stroke-width", 0.1)
+        .attr("fill", "none")
 }
 
 
@@ -191,4 +242,21 @@ export function drawPartialFillGlyphs(contentGroup, xScale, yScale, feature_colu
 
     // glyph lines (outline and segment borders)
     drawGlyphLines(contentGroup, glyphData)
+}
+
+
+export function drawWhiskerGlyphs(contentGroup, xScale, yScale, feature_column) {
+    const { glyphData, segmentData } = calculateGlyphData(xScale, yScale, feature_column)
+
+    // removing old glyphs
+    clearGlyphs(contentGroup)
+
+    // segment fills
+    drawGlyphFillsBinary(contentGroup, segmentData)
+
+    // glyph lines (outline and segment borders)
+    drawGlyphLines(contentGroup, glyphData)
+
+    // whiskers
+    drawGlyphWhiskers(contentGroup, segmentData)
 }
