@@ -11,16 +11,22 @@ function getNumClasses() {
 }
 
 
-function getGlyphSize(xScale, yScale) {
+function getGlyphBoundingSize(xScale, yScale) {
     return Math.min(
         (xScale(0.01) - xScale(0)),
         (yScale(0.01) - yScale(0))
-    ) * glyphSizeMultiplier
+    )
+}
+
+
+function getGlyphSize(xScale, yScale) {
+    return getGlyphBoundingSize(xScale, yScale) * glyphSizeMultiplier
 }
 
 
 function calculateGlyphData(xScale, yScale, featureColumn) {
     const numClasses = getNumClasses()
+    const glyphBoundingSize = getGlyphBoundingSize(xScale, yScale)
     const glyphSize = getGlyphSize(xScale, yScale)
 
     const glyphData = []
@@ -32,8 +38,8 @@ function calculateGlyphData(xScale, yScale, featureColumn) {
         const cx = xScale(d[featureColumn][0]) + margin.left
         const cy = yScale(d[featureColumn][1]) + margin.bottom
 
-        const mx = cx + glyphSize/2
-        const my = cy + glyphSize/2
+        const mx = cx + glyphBoundingSize/2
+        const my = cy + glyphBoundingSize/2
 
         const circlePoints = []
         for (let i = 0; i < numClasses; i++) {
