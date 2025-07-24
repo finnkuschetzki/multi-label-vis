@@ -1,4 +1,5 @@
 import { data } from "@/stores/data.js"
+import { showOverlay, overlayPosition } from "@/stores/overlay.js"
 import { margin, glyphSizeMultiplier, tableau20 } from "@/chart/settings.js"
 
 
@@ -62,10 +63,12 @@ function calculateGlyphData(xScale, yScale, featureColumn) {
         }
 
         glyphData.push({
+            "cx": cx,
+            "cy": cy,
             "mx": mx,
             "my": my,
             "circlePoints": circlePoints,
-            "segments": segments
+            "segments": segments,
         })
     })
 
@@ -83,6 +86,7 @@ function clearGlyphs(contentGroup) {
     contentGroup.selectAll(".glyph-lines").remove()
     contentGroup.selectAll(".glyph-segment-fills").remove()
     contentGroup.selectAll(".glyph-whiskers").remove()
+    contentGroup.selectAll(".glyph-event-box").remove()
 }
 
 
@@ -220,6 +224,31 @@ function drawGlyphWhiskers(contentGroup, segmentData) {
 
 
 
+/* EVENTS */
+
+
+export function overlayOnClick(contentGroup, glyphData, xScale, yScale) {
+    const glyphSize = getGlyphSize(xScale, yScale)
+
+    contentGroup.selectAll(".glyph-event-box")
+        .data(glyphData)
+        .enter()
+        .append("rect")
+        .attr("class", "glyph-event.box")
+        .attr("x", d => d.cx)
+        .attr("y", d => d.cy)
+        .attr("width", glyphSize)
+        .attr("height", glyphSize)
+        .attr("stroke", "none")
+        .attr("fill", "none")
+        .attr("pointer-events", "all")
+        .on("click", (event, d) => {
+            showOverlay.value = true
+        })
+}
+
+
+
 /* FULL GLYPHS */
 
 
@@ -234,6 +263,9 @@ export function drawBinaryGlyphs(contentGroup, xScale, yScale, feature_column) {
 
     // glyph lines (outline and segment borders)
     drawGlyphLines(contentGroup, glyphData)
+
+    // details overlay on click
+    overlayOnClick(contentGroup, glyphData, xScale, yScale)
 }
 
 
@@ -248,6 +280,9 @@ export function drawPartialFillGlyphs(contentGroup, xScale, yScale, feature_colu
 
     // glyph lines (outline and segment borders)
     drawGlyphLines(contentGroup, glyphData)
+
+    // details overlay on click
+    overlayOnClick(contentGroup, glyphData, xScale, yScale)
 }
 
 
@@ -265,4 +300,7 @@ export function drawWhiskerGlyphs(contentGroup, xScale, yScale, feature_column) 
 
     // whiskers
     drawGlyphWhiskers(contentGroup, segmentData)
+
+    // details overlay on click
+    overlayOnClick(contentGroup, glyphData, xScale, yScale)
 }
