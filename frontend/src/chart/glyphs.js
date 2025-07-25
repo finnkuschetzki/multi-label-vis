@@ -1,5 +1,5 @@
 import { data } from "@/stores/data.js"
-import { showOverlay, overlayPosition, dataPointGroundTruth, dataPointPredictions } from "@/stores/overlay.js"
+import { showOverlay, overlayPosition, dataPointGroundTruth, dataPointPredictions, dataPointImagePath } from "@/stores/overlay.js"
 import { margin, glyphSizeMultiplier, tableau20 } from "@/chart/settings.js"
 
 
@@ -69,6 +69,7 @@ function calculateGlyphData(xScale, yScale, featureColumn) {
             "my": my,
             "circlePoints": circlePoints,
             "segments": segments,
+            "imagePath": d["image_path"],
             "groundTruth": d["ground_truth"],
             "predictions": d["predictions"]
         })
@@ -246,6 +247,7 @@ export function overlayOnClick(contentGroup, glyphData, xScale, yScale) {
         .attr("pointer-events", "all")
         .on("click", (event, d) => {
             showOverlay.value = true
+            dataPointImagePath.value = d.imagePath
             dataPointGroundTruth.value = d.groundTruth
             dataPointPredictions.value = d.predictions
         })

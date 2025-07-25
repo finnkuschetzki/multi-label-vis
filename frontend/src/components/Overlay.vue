@@ -1,8 +1,9 @@
 <script setup>
-import { onMounted, onUnmounted } from "vue"
+import { ref, onMounted, onUnmounted, watch } from "vue"
 
-import { showOverlay, dataPointGroundTruth, dataPointPredictions } from "@/stores/overlay.js"
+import { showOverlay, dataPointGroundTruth, dataPointPredictions, dataPointImagePath } from "@/stores/overlay.js"
 import OverlayValueList from "@/components/OverlayValueList.vue";
+import httpClient from "@/httpClient/httpClient.js";
 
 
 function hideOverlay() {
@@ -23,11 +24,31 @@ onMounted(() => {
 onUnmounted(() => {
   document.removeEventListener("keydown", hideOverlayOnEsc)
 })
+
+
+const isImageSet = ref(false)
+const imageURL = ref()
+
+watch(dataPointImagePath, async (newDataPointImagePath) => {
+  const res = await httpClient.get("image/", {
+    params: {
+      "imagePath": newDataPointImagePath
+    },
+    responseType: "blob"
+  })
+
+  imageURL.value = URL.createObjectURL(res.data)
+  isImageSet.value = true
+})
 </script>
 
 <template>
   <div class="overlay-container">
     <div class="content-container">
+
+      <div class="content-column image-column">
+        <img v-if="isImageSet" :src="imageURL" />
+      </div>
 
       <div class="content-column values-column">
         <OverlayValueList title="Ground Truth" :values="dataPointGroundTruth" />
@@ -64,6 +85,15 @@ onUnmounted(() => {
 .content-column {
   height: 100%;
   max-height: 100%;
+}
+
+.image-column {
+  width: 35%
+}
+
+.image-column > img {
+  width: auto;
+  height: 100%;
 }
 
 .values-column {
