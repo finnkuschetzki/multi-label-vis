@@ -23,6 +23,7 @@ def read_csv_with_list_attributes(path, list_attributes):
 
 def apply_dimensionality_reduction(in_df):
     out_df = pd.DataFrame()
+    out_df["image_path"] = in_df["image_path"].copy()
     out_df["ground_truth"] = in_df["ground_truth"].copy()
     out_df["predictions"] = in_df["predictions"].copy()
     out_df["binarized_predictions"] = in_df["binarized_predictions"].copy()

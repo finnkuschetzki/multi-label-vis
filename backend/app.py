@@ -1,4 +1,4 @@
-from flask import Flask, request, jsonify
+from flask import Flask, request, send_file
 from flask_cors import CORS
 
 from process_data import *
@@ -35,6 +35,14 @@ def data():
         or_df = apply_overlap_removal(df, x_factor, y_factor)
 
     return or_df.to_json(orient="records")
+
+
+@app.route("/image/")
+def image():
+    image_path = request.args.get("imagePath")
+
+    # todo not safe for public use, use send_from_directory instead
+    return send_file(image_path, mimetype="image/jpeg")
 
 
 if __name__ == "__main__":
