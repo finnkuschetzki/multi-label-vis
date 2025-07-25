@@ -23,11 +23,16 @@ def load_image(image_path):
     return img
 
 
-def get_dataset(image_infos, train=False):
+def get_dataset(image_infos, train=False, include_path=False):
     image_paths, label_vectors = zip(*image_infos)
     image_paths, label_vectors = np.array(image_paths), np.array(label_vectors)
     dataset = tf.data.Dataset.from_tensor_slices((image_paths, label_vectors))
-    dataset = dataset.map(lambda path, label_vec: (load_image(path), label_vec), num_parallel_calls=tf.data.AUTOTUNE)
+    if include_path:
+        # dataset has tuples (path, image, labels)
+        dataset = dataset.map(lambda path, label_vec: (path, load_image(path), label_vec), num_parallel_calls=tf.data.AUTOTUNE)
+    else:
+        # dataset has tuples (image, labels)
+        dataset = dataset.map(lambda path, label_vec: (load_image(path), label_vec), num_parallel_calls=tf.data.AUTOTUNE)
     if train:
         dataset = dataset.shuffle(1000)
     dataset = dataset.batch(32).prefetch(tf.data.AUTOTUNE)
@@ -36,6 +41,9 @@ def get_dataset(image_infos, train=False):
 
 train_dataset = get_dataset(train_image_infos, train=True)
 val_dataset = get_dataset(val_image_infos)
+
+train_dataset_for_prediction = get_dataset(train_image_infos, include_path=True)
+val_dataset_for_prediction = get_dataset(val_image_infos, include_path=True)
 
 
 # configure export

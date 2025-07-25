@@ -2,6 +2,7 @@ import pandas as pd
 from keras import models
 
 from _command_line_tools import *
+from pipeline import val_dataset_for_prediction
 from preprocess import *
 from pipeline import *
 
@@ -23,12 +24,13 @@ print()
 print("predicting...")
 
 rows = []
-for batch_images, batch_labels in val_dataset:
+for batch_paths, batch_images, batch_labels in val_dataset_for_prediction:
     features = base_model.predict(batch_images, verbose=0)
     predictions = model.predict(batch_images, verbose=0)
     binarized_predictions = [(ps >= 0.5).astype(int) for ps in predictions]
     for i in range(len(predictions)):
         rows.append({
+            "image_path": batch_paths[i].numpy().decode("utf-8"),  # relative path will also work from backend
             "ground_truth": batch_labels[i].numpy().tolist(),
             "features": features[i].tolist(),
             "predictions": predictions[i].tolist(),
