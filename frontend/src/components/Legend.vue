@@ -16,7 +16,11 @@ const isInitialized = ref(false)
 
 
 onMounted(async () => {
-  const res = await httpClient.get("class-info/")
+  const res = await httpClient.get("class-info/", {
+    params: {
+      "modelName": "base-model"
+    }
+  })
   classInfo.value = res.data
 
   isInitialized.value = true

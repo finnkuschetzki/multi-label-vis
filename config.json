@@ -1,0 +1,12 @@
+{
+    "models": [
+        {
+            "name": "base-model",
+            "path": "model/saved_models/03-super_cats-electronic_furniture_kitchen",
+            "glyphSize": {
+                "train": 0.002,
+                "val": 0.01
+            }
+        }
+    ]
+}

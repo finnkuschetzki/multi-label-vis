@@ -1,12 +1,13 @@
 <script setup>
 import Overlay from "@/components/Overlay.vue"
 
-import { ref, onMounted, nextTick, watchEffect } from "vue"
+import { ref, onMounted, nextTick, watch } from "vue"
 import { useElementSize } from "@vueuse/core"
 
 import httpClient from "@/httpClient/httpClient.js"
 
 import { data } from "@/stores/data.js"
+import * as settings from "@/stores/settings.js"
 import { showOverlay, overlayPosition } from "@/stores/overlay.js"
 import { setupChart, updateChart } from "@/chart/base.js"
 
@@ -21,7 +22,7 @@ const chart = ref()
 let chart_width, chart_height, factorX, factorY
 
 
-onMounted(async () => {
+async function requestData() {
   await nextTick()
 
   // getting container size and calculating factors
@@ -34,6 +35,8 @@ onMounted(async () => {
   // requesting data
   const res = await httpClient.get("data/", {
     params: {
+      "modelName": "base-model",
+      "dataType": settings.dataType.value,
       "factorX": factorX,
       "factorY": factorY
     }
@@ -43,10 +46,22 @@ onMounted(async () => {
   console.log(data.value)
 
   await nextTick()
+}
+
+onMounted(async () => {
+  await requestData()
 
   // chart setup and watch update
   setupChart(chart, chart_width, chart_height, factorX, factorY)
-  watchEffect(updateChart)
+  watch(
+      [settings.useDGrid, settings.dimensionalityReduction, settings.glyphType],
+      () => updateChart(),
+      { immediate: true }
+  )
+  watch(
+      settings.dataType,
+      async () => { await requestData(); updateChart() },
+  )
 })
 </script>
 

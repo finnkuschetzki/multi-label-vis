@@ -1,4 +1,7 @@
+import config from "../../../config.json"
+
 import { data } from "@/stores/data.js"
+import * as settings from "@/stores/settings.js"
 import { showOverlay, overlayPosition, dataPointGroundTruth, dataPointPredictions, dataPointImagePath } from "@/stores/overlay.js"
 import { margin, glyphSizeMultiplier, tableau20 } from "@/chart/settings.js"
 
@@ -13,9 +16,10 @@ function getNumClasses() {
 
 
 function getGlyphBoundingSize(xScale, yScale) {
+    const glyphSize = config.models.find(m => m.name === "base-model")["glyphSize"][settings.dataType.value]
     return Math.min(
-        (xScale(0.01) - xScale(0)),
-        (yScale(0.01) - yScale(0))
+        (xScale(glyphSize) - xScale(0)),
+        (yScale(glyphSize) - yScale(0))
     )
 }
 

@@ -8,6 +8,10 @@ import * as settings from "@/stores/settings.js"
 const visible = ref()
 
 // options
+const dataTypeOptions = [
+  { name: "Training", value: "train" },
+  { name: "Validation", value: "val" }
+]
 const dimensionalityReductionOptions = [
   { name: "PCA", value: "pca" },
   { name: "UMAP", value: "umap" },
@@ -21,6 +25,7 @@ const glyphTypeOptions = [
 
 // standard settings
 data.value = null
+settings.dataType.value = "val"
 settings.useDGrid.value = true
 settings.dimensionalityReduction.value = "pca"
 settings.glyphType.value = "binary"
@@ -40,6 +45,18 @@ settings.glyphType.value = "binary"
       }"
   >
     <div class="menu-container">
+
+      <div>
+        <SelectButton
+          v-model="settings.dataType"
+          :options="dataTypeOptions"
+          option-label="name"
+          option-value="value"
+          :allow-empty="false"
+        />
+      </div>
+
+      <Divider />
 
       <div class="toggle-switch">
         <label for="d-grid-toggle">DGrid</label>
