@@ -53,4 +53,6 @@ __all__ = [
     "load_image",
     "train_dataset",
     "val_dataset",
+    "train_dataset_for_prediction",
+    "val_dataset_for_prediction",
 ]

@@ -1,10 +1,11 @@
+import time
 import pandas as pd
 from keras import models
 
 from _command_line_tools import *
-from pipeline import val_dataset_for_prediction
 from preprocess import *
 from pipeline import *
+
 
 # --- embedding data ---
 
@@ -20,31 +21,40 @@ base_model = models.Model(
     outputs = model.layers[-2].output
 )
 
-print()
-print("predicting...")
+def generate_predictions(dataset, file_name):
 
-rows = []
-for batch_paths, batch_images, batch_labels in val_dataset_for_prediction:
-    features = base_model.predict(batch_images, verbose=0)
-    predictions = model.predict(batch_images, verbose=0)
-    binarized_predictions = [(ps >= 0.5).astype(int) for ps in predictions]
-    for i in range(len(predictions)):
-        rows.append({
-            "image_path": batch_paths[i].numpy().decode("utf-8"),  # relative path will also work from backend
-            "ground_truth": batch_labels[i].numpy().tolist(),
-            "features": features[i].tolist(),
-            "predictions": predictions[i].tolist(),
-            "binarized_predictions": binarized_predictions[i].tolist(),
-        })
+    print()
+    print("predicting...")
 
-print("finished!")
+    start = time.time()
 
-# saving into csv
-df = pd.DataFrame(rows)
-df.to_csv(f"{MODEL_DIR}/embedding_data.csv", index=False)
+    rows = []
+    for batch_paths, batch_images, batch_labels in dataset:
+        features = base_model.predict(batch_images, verbose=0)
+        predictions = model.predict(batch_images, verbose=0)
+        binarized_predictions = [(ps >= 0.5).astype(int) for ps in predictions]
+        for i in range(len(predictions)):
+            rows.append({
+                "image_path": batch_paths[i].numpy().decode("utf-8"),  # relative path will also work from backend
+                "ground_truth": batch_labels[i].numpy().tolist(),
+                "features": features[i].tolist(),
+                "predictions": predictions[i].tolist(),
+                "binarized_predictions": binarized_predictions[i].tolist(),
+            })
 
-print()
-print(f"saved ground_truth, features, predictions, binarized_predictions as {MODEL_DIR}/embedding_data.csv")
+    end = time.time()
+
+    print(f"Done (t={end-start:.2f}s)")
+
+    # saving into csv
+    df = pd.DataFrame(rows)
+    df.to_csv(f"{MODEL_DIR}/{file_name}.csv", index=False)
+
+    print()
+    print(f"saved ground_truth, features, predictions, binarized_predictions as {MODEL_DIR}/{file_name}.csv")
+
+generate_predictions(train_dataset_for_prediction, "embedding_data_train")
+generate_predictions(val_dataset_for_prediction, "embedding_data_val")
 
 
 # --- class info ---
