@@ -90,6 +90,7 @@ function calculateGlyphData(xScale, yScale, featureColumn) {
 
 
 function clearGlyphs(contentGroup) {
+    // todo change name of glyph-lines (does not fit for simple glyph)
     contentGroup.selectAll(".glyph-lines").remove()
     contentGroup.selectAll(".glyph-segment-fills").remove()
     contentGroup.selectAll(".glyph-whiskers").remove()
@@ -287,13 +288,16 @@ export function overlayOnClick(contentGroup, glyphData, xScale, yScale) {
 
 
 export function drawSimpleGlyphs(contentGroup, xScale, yScale, feature_column) {
-    const { glyphData, segmentData } = calculateGlyphData(xScale, yScale, feature_column)
+    const { glyphData } = calculateGlyphData(xScale, yScale, feature_column)
 
     // removing old glyphs
     clearGlyphs(contentGroup)
 
     // simple glyphs
     drawCircles(contentGroup, glyphData, xScale, yScale)
+
+    // details overlay on click
+    overlayOnClick(contentGroup, glyphData, xScale, yScale)
 }
 
 
