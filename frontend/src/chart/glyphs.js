@@ -250,6 +250,14 @@ export function overlayOnClick(contentGroup, glyphData, xScale, yScale) {
             dataPointImagePath.value = d.imagePath
             dataPointGroundTruth.value = d.groundTruth
             dataPointPredictions.value = d.predictions
+            // calculate overlayPosition
+            const chartBoundingClientRect = document.getElementById("chart").getBoundingClientRect()
+            const chartMidHeight = (chartBoundingClientRect.y + chartBoundingClientRect.height) / 2
+            if (event.clientY < chartMidHeight) {
+                overlayPosition.value = "bottom"
+            } else {
+                overlayPosition.value = "top"
+            }
         })
 }
 
