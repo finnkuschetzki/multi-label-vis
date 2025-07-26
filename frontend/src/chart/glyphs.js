@@ -97,6 +97,22 @@ function clearGlyphs(contentGroup) {
 }
 
 
+function drawCircles(contentGroup, glyphData, xScale, yScale) {
+    const glyphSize = getGlyphSize(xScale, yScale)
+
+    contentGroup.selectAll(".glyph-lines")
+        .data(glyphData)
+        .enter()
+        .append("circle")
+        .attr("class", "glyph-lines")
+        .attr("cx", g => g.cx)
+        .attr("cy", g => g.cy)
+        .attr("r", glyphSize / 2)
+        .attr("stroke", "none")
+        .attr("fill", "black")
+}
+
+
 function drawGlyphLines(contentGroup, glyphData) {
     contentGroup.selectAll(".glyph-lines")
         .data(glyphData)
@@ -268,6 +284,17 @@ export function overlayOnClick(contentGroup, glyphData, xScale, yScale) {
 
 
 /* FULL GLYPHS */
+
+
+export function drawSimpleGlyphs(contentGroup, xScale, yScale, feature_column) {
+    const { glyphData, segmentData } = calculateGlyphData(xScale, yScale, feature_column)
+
+    // removing old glyphs
+    clearGlyphs(contentGroup)
+
+    // simple glyphs
+    drawCircles(contentGroup, glyphData, xScale, yScale)
+}
 
 
 export function drawBinaryGlyphs(contentGroup, xScale, yScale, feature_column) {

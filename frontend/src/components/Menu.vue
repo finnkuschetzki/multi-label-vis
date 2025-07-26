@@ -18,6 +18,7 @@ const dimensionalityReductionOptions = [
   { name: "t-SNE", value: "tsne" }
 ]
 const glyphTypeOptions = [
+  { name: "Simple", value: "simple" },
   { name: "Binary", value: "binary" },
   { name: "Partial Fill", value: "partialFill" },
   { name: "Whisker", value: "whisker" }
@@ -28,7 +29,7 @@ data.value = null
 settings.dataType.value = "val"
 settings.useDGrid.value = true
 settings.dimensionalityReduction.value = "pca"
-settings.glyphType.value = "binary"
+settings.glyphType.value = "simple"
 </script>
 
 <template>

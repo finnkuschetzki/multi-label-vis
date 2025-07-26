@@ -2,7 +2,7 @@ import * as d3 from "d3"
 
 import * as settings from "@/stores/settings.js"
 import { margin } from "@/chart/settings.js"
-import { drawBinaryGlyphs, drawPartialFillGlyphs, drawWhiskerGlyphs } from "@/chart/glyphs.js"
+import { drawSimpleGlyphs, drawBinaryGlyphs, drawPartialFillGlyphs, drawWhiskerGlyphs } from "@/chart/glyphs.js"
 
 
 let svg, xScale, yScale, contentGroup, zoom
@@ -56,6 +56,9 @@ export function updateChart() {
     if (settings.useDGrid.value) feature_column += "_or"
 
     switch (settings.glyphType.value) {
+        case "simple":
+            drawSimpleGlyphs(contentGroup, xScale, yScale, feature_column)
+            break
         case "binary":
             drawBinaryGlyphs(contentGroup, xScale, yScale, feature_column)
             break
