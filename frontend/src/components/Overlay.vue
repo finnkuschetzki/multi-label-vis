@@ -88,12 +88,15 @@ watch(dataPointImagePath, async (newDataPointImagePath) => {
 }
 
 .image-column {
-  width: 35%
+  width: 40%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
 }
 
 .image-column > img {
-  width: auto;
-  height: 100%;
+  max-width: 100%;
+  max-height: 100%;
 }
 
 .values-column {
@@ -101,7 +104,7 @@ watch(dataPointImagePath, async (newDataPointImagePath) => {
 }
 
 .button-column {
-  width: 10%;
+  width: 5%;
 }
 
 .close-button {
