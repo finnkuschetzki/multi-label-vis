@@ -6,6 +6,9 @@ from flask_cors import CORS
 from process_data import *
 
 
+# frontend expects Flask App on port 5001
+
+
 # --- load config ---
 
 with open("../config.json", "r") as f:
@@ -39,19 +42,6 @@ for model in config["models"]:
         "data": { "train": train_data, "val": val_data },
         "glyph_size": model["glyphSize"],
     }
-
-# embedding_data_path_list = [
-#     "../model/output/embedding_data_train.csv",
-#     "../model/output/embedding_data_val.csv",
-# ]
-#
-# processed_data_list = [
-#     apply_dimensionality_reduction(read_csv_with_list_attributes(path, ["ground_truth", "features", "predictions", "binarized_predictions"]))
-#     for path in embedding_data_path_list
-# ]
-
-# df = read_csv_with_list_attributes("../model/output/embedding_data.csv", ["ground_truth", "features", "predictions", "binarized_predictions"])
-# df = apply_dimensionality_reduction(df)
 
 
 # --- load class info ---
