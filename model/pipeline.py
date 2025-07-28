@@ -1,10 +1,11 @@
-from preprocess import coco_train, train_image_infos, val_image_infos
-
 import tensorflow as tf
 import numpy as np
 
+from _config_loader import config
+from preprocess import coco_train, train_image_infos, val_image_infos
 
-IMG_SIZE = 224
+
+IMG_SIZE = config["IMG_SIZE"]
 
 
 def get_image_labels(image_id):

@@ -1,17 +1,15 @@
-from pycocotools.coco import COCO
-from collections import defaultdict
 import numpy as np
+from collections import defaultdict
+from pycocotools.coco import COCO
+
+from _config_loader import config
 
 
 DATA_DIR = "../coco_dataset/data"
 TRAIN_IMG_DIR = DATA_DIR + "/images/train2017"
 VAL_IMG_DIR = DATA_DIR + "/images/val2017"
 
-CATEGORY_IDS = [
-    44, 46, 47, 48, 49, 50, 51,  # kitchen categories
-    62, 63, 64, 65, 67, 70,  # furniture categories
-    72, 73, 74, 75, 76, 77  # electronic furniture
-]
+CATEGORY_IDS = config["CATEGORY_IDS"]
 
 
 # creating COCO instances (annotations for train2017 and val2017)

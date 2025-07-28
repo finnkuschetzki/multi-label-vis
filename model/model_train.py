@@ -5,13 +5,10 @@ import shutil
 from keras.applications import EfficientNetV2B0
 from keras import layers, models, optimizers, metrics
 
+from _config_loader import config
 from preprocess import *
 from pipeline import *
 from custom_callbacks import *
-
-
-TRAIN_HEAD_EPOCHS = 5
-MAX_FINETUNE_EPOCHS = 30
 
 
 # --- creating the model ---
@@ -47,7 +44,7 @@ def train_head_only(base_model_, model_):
     base_model_.trainable = False
 
     model_.compile(
-        optimizer=optimizers.Adam(1e-3),
+        optimizer=optimizers.Adam(config["learning_rate"]["head_only"]),
         loss="binary_crossentropy",
         metrics=[
             metrics.BinaryAccuracy(name="accuracy"),
@@ -59,7 +56,7 @@ def train_head_only(base_model_, model_):
     model_.fit(
         train_dataset,
         validation_data=val_dataset,
-        epochs=TRAIN_HEAD_EPOCHS,
+        epochs=config["max_epochs"]["head_only"],
         callbacks=callbacks_head_only,
     )
 
@@ -73,7 +70,7 @@ def train_head_only(base_model_, model_):
 def fine_tune(model_, initial_epoch=0):
 
     model_.compile(
-        optimizer=optimizers.Adam(1e-5),
+        optimizer=optimizers.Adam(config["learning_rate"]["fine_tune"]),
         loss="binary_crossentropy",
         metrics=[
             metrics.BinaryAccuracy(name="accuracy"),
@@ -85,9 +82,9 @@ def fine_tune(model_, initial_epoch=0):
     model_.fit(
         train_dataset,
         validation_data=val_dataset,
-        epochs=MAX_FINETUNE_EPOCHS,
+        epochs=config["max_epochs"]["fine_tune"],
         initial_epoch=initial_epoch,
-        callbacks=[callbacks_fine_tune],
+        callbacks=callbacks_fine_tune,
     )
 
     model_.save("output/fine_tuned.keras")
@@ -112,6 +109,11 @@ if __name__ == "__main__":
         # cleaning output directory
         if os.path.exists("output") and os.path.isdir("output"):
             shutil.rmtree("output")
+
+        # copying config file
+        if not os.path.isdir("output"):
+            os.mkdir("output")
+        shutil.copy("_config.json", "output")
 
         # training
         base_model, model = create_model()

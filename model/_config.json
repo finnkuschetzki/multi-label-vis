@@ -1,0 +1,41 @@
+{
+  "CATEGORY_IDS": [ 1, 2, 3, 4, 5, 6, 7, 8, 9, 34, 35, 36, 37, 38, 39, 40, 41, 42, 43 ],
+
+  "IMG_SIZE": 224,
+
+  "max_epochs": {
+    "head_only": 5,
+    "fine_tune": 30
+  },
+
+  "learning_rate": {
+    "head_only": 1e-3,
+    "fine_tune": 1e-5
+  },
+
+  "lr_scheduler": {
+    "head_only": {
+      "factor": 0.5,
+      "patience": 1,
+      "min_delta": 0.001,
+      "min_lr": 1e-4
+    },
+    "fine_tune": {
+      "factor": 0.5,
+      "patience": 3,
+      "min_delta": 0.001,
+      "min_lr": 1e-6
+    }
+  },
+
+  "early_stopping": {
+    "head_only": {
+      "patience": 2,
+      "min_delta": 0.001
+    },
+    "fine_tune": {
+      "patience": 5,
+      "min_delta": 0.001
+    }
+  }
+}

@@ -1,6 +1,8 @@
-from keras import callbacks
-import time
 import sys
+import time
+from keras import callbacks
+
+from _config_loader import config
 
 
 class EpochTimer(callbacks.Callback):
@@ -41,12 +43,41 @@ tensor_board_head_only = callbacks.TensorBoard(log_dir="output/logs/head_only", 
 
 tensor_board_fine_tune = callbacks.TensorBoard(log_dir="output/logs/fine_tune", profile_batch=0)
 
-# not used during head only training
-lr_scheduler_fine_tune = callbacks.ReduceLROnPlateau(monitor="val_loss", factor=0.5, patience=3, min_lr=1e-6, verbose=1)
+lr_scheduler_head_only = callbacks.ReduceLROnPlateau(
+    monitor="val_loss",
+    factor=config["lr_scheduler"]["head_only"]["factor"],
+    patience=config["lr_scheduler"]["head_only"]["patience"],
+    min_delta=config["lr_scheduler"]["head_only"]["min_delta"],
+    min_lr=config["lr_scheduler"]["head_only"]["min_lr"],
+    verbose=1
+)
 
-early_stopping_head_only = callbacks.EarlyStopping(monitor="val_loss", patience=2, restore_best_weights=True, min_delta=0.001, mode="min", verbose=1)
+lr_scheduler_fine_tune = callbacks.ReduceLROnPlateau(
+    monitor="val_loss",
+    factor=config["lr_scheduler"]["fine_tune"]["factor"],
+    patience=config["lr_scheduler"]["fine_tune"]["patience"],
+    min_delta=config["lr_scheduler"]["fine_tune"]["min_delta"],
+    min_lr=config["lr_scheduler"]["fine_tune"]["min_lr"],
+    verbose=1,
+)
 
-early_stopping_fine_tune = callbacks.EarlyStopping(monitor="val_loss", patience=5, restore_best_weights=True, min_delta=0.001, mode="min", verbose=1)
+early_stopping_head_only = callbacks.EarlyStopping(
+    monitor="val_loss",
+    patience=config["early_stopping"]["head_only"]["patience"],
+    restore_best_weights=True,
+    min_delta=config["early_stopping"]["head_only"]["min_delta"],
+    mode="min",
+    verbose=1
+)
+
+early_stopping_fine_tune = callbacks.EarlyStopping(
+    monitor="val_loss",
+    patience=config["early_stopping"]["fine_tune"]["patience"],
+    restore_best_weights=True,
+    min_delta=config["early_stopping"]["fine_tune"]["min_delta"],
+    mode="min",
+    verbose=1
+)
 
 
 # --- callback lists ---
@@ -55,6 +86,7 @@ callbacks_head_only = [
     epoch_timer,
     model_checkpoint_head_only,
     tensor_board_head_only,
+    lr_scheduler_head_only,
     early_stopping_head_only,
 ]
 
