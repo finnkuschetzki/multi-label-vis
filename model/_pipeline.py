@@ -2,7 +2,7 @@ import tensorflow as tf
 import numpy as np
 
 from _config_loader import config
-from preprocess import coco_train, train_image_infos, val_image_infos
+from _preprocess import coco_train, train_image_infos, val_image_infos
 
 
 IMG_SIZE = config["IMG_SIZE"]

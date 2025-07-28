@@ -6,9 +6,9 @@ from keras.applications import EfficientNetV2B0
 from keras import layers, models, optimizers, metrics
 
 from _config_loader import config
-from preprocess import *
-from pipeline import *
-from custom_callbacks import *
+from _preprocess import *
+from _pipeline import *
+from train_callbacks import *
 
 
 # --- creating the model ---

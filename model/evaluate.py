@@ -6,8 +6,8 @@ from keras import models
 from sklearn.metrics import accuracy_score, precision_score, recall_score
 
 from _command_line_tools import *
-from preprocess import *
-from pipeline import *
+from _preprocess import *
+from _pipeline import *
 
 
 MODEL_DIR = get_model_dir()

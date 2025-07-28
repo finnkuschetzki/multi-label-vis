@@ -1,8 +1,8 @@
 import tensorflow as tf
 from keras import models
 
-from preprocess import *
-from pipeline import *
+from _preprocess import *
+from _pipeline import *
 
 
 def predict_image(model, image_path):
