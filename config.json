@@ -1,11 +1,30 @@
 {
     "models": [
         {
-            "name": "base-model",
+            "name": "electronic_furniture_kitchen",
             "path": "model/saved_models/03-super_cats-electronic_furniture_kitchen",
+            "displayName": "Electronic, Furniture, Kitchen",
             "glyphSize": {
                 "train": 0.002,
                 "val": 0.01
+            }
+        },
+        {
+            "name": "person_sports_vehicle",
+            "path": "model/saved_models/04-super_cats-person_sports_vehicle",
+            "displayName": "Person, Sports, Vehicle",
+            "glyphSize": {
+                "train": 0.0015,
+                "val": 0.005
+            }
+        },
+        {
+            "name": "top_20",
+            "path": "model/saved_models/05-top_20_categories",
+            "displayName": "20 häufigste Kategorien",
+            "glyphSize": {
+                "train": 0.001,
+                "val": 0.005
             }
         }
     ]

@@ -1,9 +1,10 @@
-<script setup lang="ts">
-import { ref, onMounted } from "vue"
+<script setup>
+import { ref, onMounted, watch } from "vue"
 
 import httpClient from "@/httpClient/httpClient.js"
 
-import { classInfo } from '@/stores/data'
+import { classInfo } from "@/stores/data"
+import * as settings from "@/stores/settings"
 
 
 const tableau20 = [
@@ -15,15 +16,23 @@ const tableau20 = [
 const isInitialized = ref(false)
 
 
-onMounted(async () => {
+async function requestClassInfo() {
   const res = await httpClient.get("class-info/", {
     params: {
-      "modelName": "base-model"
+      "modelName": settings.modelName.value
     }
   })
   classInfo.value = res.data
 
   isInitialized.value = true
+}
+
+onMounted(async () => {
+  await requestClassInfo()
+
+  watch(settings.modelName, async () => {
+    await requestClassInfo()
+  })
 })
 
 

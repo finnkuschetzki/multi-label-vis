@@ -20,11 +20,15 @@ with open("../config.json", "r") as f:
 models_dict = dict()
 
 def load_or_apply_and_save(model_name, model_path, data_type):
+    print()
+    print(f"--- {model_name}, {data_type} ---")
     if os.path.exists(f"computed_model_data/{model_name}/{data_type}_data.csv"):
         data_ = read_csv_with_list_attributes(
             f"computed_model_data/{model_name}/{data_type}_data.csv",
             ["ground_truth", "pca_features", "umap_features", "tsne_features", "predictions", "binarized_predictions"]
         )
+        print()
+        print("data loaded")
     else:
         data_ = apply_dimensionality_reduction(read_csv_with_list_attributes(
             f"../{model_path}/embedding_data_{data_type}.csv",
@@ -54,6 +58,7 @@ for model in config["models"]:
 
 # --- Flask App ---
 
+print()
 app = Flask(__name__)
 CORS(app, origins=["http://localhost:5173"])
 

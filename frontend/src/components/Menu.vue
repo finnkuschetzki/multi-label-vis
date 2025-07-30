@@ -1,6 +1,8 @@
 <script setup>
 import { ref } from "vue";
 
+import config from "../../../config.json"
+
 import { data } from "@/stores/data.js"
 import * as settings from "@/stores/settings.js"
 
@@ -8,6 +10,9 @@ import * as settings from "@/stores/settings.js"
 const visible = ref()
 
 // options
+const modelNameOptions = config.models.map(m => {
+  return { "label": m.displayName, "value": m.name }
+})
 const dataTypeOptions = [
   { name: "Training", value: "train" },
   { name: "Validation", value: "val" }
@@ -26,6 +31,7 @@ const glyphTypeOptions = [
 
 // standard settings
 data.value = null
+settings.modelName.value = modelNameOptions[0].value
 settings.dataType.value = "val"
 settings.useDGrid.value = true
 settings.dimensionalityReduction.value = "pca"
@@ -46,6 +52,8 @@ settings.glyphType.value = "simple"
       }"
   >
     <div class="menu-container">
+
+      <Select v-model="settings.modelName" :options="modelNameOptions" option-label="label" option-value="value" />
 
       <div>
         <SelectButton

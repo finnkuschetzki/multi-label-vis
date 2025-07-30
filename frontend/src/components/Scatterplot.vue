@@ -35,7 +35,7 @@ async function requestData() {
   // requesting data
   const res = await httpClient.get("data/", {
     params: {
-      "modelName": "base-model",
+      "modelName": settings.modelName.value,
       "dataType": settings.dataType.value,
       "factorX": factorX,
       "factorY": factorY
@@ -59,7 +59,7 @@ onMounted(async () => {
       { immediate: true }
   )
   watch(
-      settings.dataType,
+      [settings.modelName, settings.dataType],
       async () => { await requestData(); updateChart() },
   )
 })
