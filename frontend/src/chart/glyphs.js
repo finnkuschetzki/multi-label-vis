@@ -15,24 +15,25 @@ function getNumClasses() {
 }
 
 
-function getGlyphBoundingSize(xScale, yScale) {
-    const glyphSize = config.models.find(m => m.name === "base-model")["glyphSize"][settings.dataType.value]
-    return Math.min(
-        (xScale(glyphSize) - xScale(0)),
-        (yScale(glyphSize) - yScale(0))
-    )
-}
-
-
 function getGlyphSize(xScale, yScale) {
-    return getGlyphBoundingSize(xScale, yScale) * glyphSizeMultiplier
+    const desiredGlyphSize = config.models.find(m => m.name === "base-model")["glyphSize"][settings.dataType.value]
+    const glyphBoundingSize = Math.min(
+        (xScale(desiredGlyphSize) - xScale(0)),
+        (yScale(desiredGlyphSize) - yScale(0))
+    )
+    const glyphSize = glyphBoundingSize * glyphSizeMultiplier
+    return { glyphSize, glyphBoundingSize }
 }
 
 
-function calculateGlyphData(xScale, yScale, featureColumn) {
+function getStrokeWidth() {
+    const desiredGlyphSize = config.models.find(m => m.name === "base-model")["glyphSize"][settings.dataType.value]
+    return desiredGlyphSize * 10
+}
+
+
+function calculateGlyphData(xScale, yScale, glyphSize, glyphBoundingSize, featureColumn) {
     const numClasses = getNumClasses()
-    const glyphBoundingSize = getGlyphBoundingSize(xScale, yScale)
-    const glyphSize = getGlyphSize(xScale, yScale)
 
     const glyphData = []
 
@@ -98,9 +99,7 @@ function clearGlyphs(contentGroup) {
 }
 
 
-function drawCircles(contentGroup, glyphData, xScale, yScale) {
-    const glyphSize = getGlyphSize(xScale, yScale)
-
+function drawCircles(contentGroup, glyphSize, glyphData) {
     contentGroup.selectAll(".glyph-lines")
         .data(glyphData)
         .enter()
@@ -114,7 +113,7 @@ function drawCircles(contentGroup, glyphData, xScale, yScale) {
 }
 
 
-function drawGlyphLines(contentGroup, glyphData) {
+function drawGlyphLines(contentGroup, glyphData, strokeWidth) {
     contentGroup.selectAll(".glyph-lines")
         .data(glyphData)
         .enter()
@@ -139,7 +138,7 @@ function drawGlyphLines(contentGroup, glyphData) {
             return d
         })
         .attr("stroke", "black")
-        .attr("stroke-width", .1)
+        .attr("stroke-width", strokeWidth)
         .attr("fill", "none")
 }
 
@@ -197,7 +196,7 @@ function drawGlyphFillsPartial(contentGroup, segmentData) {
 }
 
 
-function drawGlyphWhiskers(contentGroup, segmentData) {
+function drawGlyphWhiskers(contentGroup, segmentData, strokeWidth) {
     contentGroup.selectAll(".glyph-whiskers")
         .data(segmentData)
         .enter()
@@ -242,7 +241,7 @@ function drawGlyphWhiskers(contentGroup, segmentData) {
             }
         })
         .attr("stroke", "black")
-        .attr("stroke-width", 0.1)
+        .attr("stroke-width", strokeWidth)
         .attr("fill", "none")
 }
 
@@ -251,9 +250,7 @@ function drawGlyphWhiskers(contentGroup, segmentData) {
 /* EVENTS */
 
 
-export function overlayOnClick(contentGroup, glyphData, xScale, yScale) {
-    const glyphSize = getGlyphSize(xScale, yScale)
-
+export function overlayOnClick(contentGroup, glyphSize, glyphData) {
     contentGroup.selectAll(".glyph-event-box")
         .data(glyphData)
         .enter()
@@ -288,21 +285,24 @@ export function overlayOnClick(contentGroup, glyphData, xScale, yScale) {
 
 
 export function drawSimpleGlyphs(contentGroup, xScale, yScale, feature_column) {
-    const { glyphData } = calculateGlyphData(xScale, yScale, feature_column)
+    const { glyphSize, glyphBoundingSize } = getGlyphSize(xScale, yScale)
+    const { glyphData } = calculateGlyphData(xScale, yScale, glyphSize, glyphBoundingSize, feature_column)
 
     // removing old glyphs
     clearGlyphs(contentGroup)
 
     // simple glyphs
-    drawCircles(contentGroup, glyphData, xScale, yScale)
+    drawCircles(contentGroup, glyphSize, glyphData)
 
     // details overlay on click
-    overlayOnClick(contentGroup, glyphData, xScale, yScale)
+    overlayOnClick(contentGroup, glyphSize, glyphData)
 }
 
 
 export function drawBinaryGlyphs(contentGroup, xScale, yScale, feature_column) {
-    const { glyphData, segmentData } = calculateGlyphData(xScale, yScale, feature_column)
+    const { glyphSize, glyphBoundingSize } = getGlyphSize(xScale, yScale)
+    const { glyphData, segmentData } = calculateGlyphData(xScale, yScale, glyphSize, glyphBoundingSize, feature_column)
+    const strokeWidth = getStrokeWidth()
 
     // removing old glyphs
     clearGlyphs(contentGroup)
@@ -311,15 +311,17 @@ export function drawBinaryGlyphs(contentGroup, xScale, yScale, feature_column) {
     drawGlyphFillsBinary(contentGroup, segmentData)
 
     // glyph lines (outline and segment borders)
-    drawGlyphLines(contentGroup, glyphData)
+    drawGlyphLines(contentGroup, glyphData, strokeWidth)
 
     // details overlay on click
-    overlayOnClick(contentGroup, glyphData, xScale, yScale)
+    overlayOnClick(contentGroup, glyphSize, glyphData)
 }
 
 
 export function drawPartialFillGlyphs(contentGroup, xScale, yScale, feature_column) {
-    const { glyphData, segmentData } = calculateGlyphData(xScale, yScale, feature_column)
+    const { glyphSize, glyphBoundingSize } = getGlyphSize(xScale, yScale)
+    const { glyphData, segmentData } = calculateGlyphData(xScale, yScale, glyphSize, glyphBoundingSize, feature_column)
+    const strokeWidth = getStrokeWidth()
 
     // removing old glyphs
     clearGlyphs(contentGroup)
@@ -328,15 +330,17 @@ export function drawPartialFillGlyphs(contentGroup, xScale, yScale, feature_colu
     drawGlyphFillsPartial(contentGroup, segmentData)
 
     // glyph lines (outline and segment borders)
-    drawGlyphLines(contentGroup, glyphData)
+    drawGlyphLines(contentGroup, glyphData, strokeWidth)
 
     // details overlay on click
-    overlayOnClick(contentGroup, glyphData, xScale, yScale)
+    overlayOnClick(contentGroup, glyphSize, glyphData)
 }
 
 
 export function drawWhiskerGlyphs(contentGroup, xScale, yScale, feature_column) {
-    const { glyphData, segmentData } = calculateGlyphData(xScale, yScale, feature_column)
+    const { glyphSize, glyphBoundingSize } = getGlyphSize(xScale, yScale)
+    const { glyphData, segmentData } = calculateGlyphData(xScale, yScale, glyphSize, glyphBoundingSize, feature_column)
+    const strokeWidth = getStrokeWidth()
 
     // removing old glyphs
     clearGlyphs(contentGroup)
@@ -345,11 +349,11 @@ export function drawWhiskerGlyphs(contentGroup, xScale, yScale, feature_column) 
     drawGlyphFillsBinary(contentGroup, segmentData)
 
     // glyph lines (outline and segment borders)
-    drawGlyphLines(contentGroup, glyphData)
+    drawGlyphLines(contentGroup, glyphData, strokeWidth)
 
     // whiskers
-    drawGlyphWhiskers(contentGroup, segmentData)
+    drawGlyphWhiskers(contentGroup, segmentData, strokeWidth)
 
     // details overlay on click
-    overlayOnClick(contentGroup, glyphData, xScale, yScale)
+    overlayOnClick(contentGroup, glyphSize, glyphData)
 }
