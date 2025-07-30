@@ -93,6 +93,7 @@ function calculateGlyphData(xScale, yScale, glyphSize, glyphBoundingSize, featur
 function clearGlyphs(contentGroup) {
     // todo change name of glyph-lines (does not fit for simple glyph)
     contentGroup.selectAll(".glyph-lines").remove()
+    contentGroup.selectAll(".glyph-segment-lines").remove()
     contentGroup.selectAll(".glyph-segment-fills").remove()
     contentGroup.selectAll(".glyph-whiskers").remove()
     contentGroup.selectAll(".glyph-event-box").remove()
@@ -193,6 +194,71 @@ function drawGlyphFillsPartial(contentGroup, segmentData) {
         .attr("stroke", "none")
         // todo cutoff at 0.1 prediction to increase performance of web app
         .attr("fill", s => s.prediction >= 0.1 ? tableau20[s.classIndex] : "none")
+}
+
+
+function drawGlyphFillsSegments(contentGroup, segmentData, strokeWidth) {
+    // segment fill
+    contentGroup.selectAll(".glyph-segment-fills")
+        .data(segmentData)
+        .enter()
+        .append("path")
+        .attr("class", "glyph-segment-fills")
+        .attr("d", s => {
+            // calculate approximate fill
+            const closestQuarter = Math.round(s.prediction * 4) / 4
+
+            // draw approximate fill
+            let d = ``
+
+            if (closestQuarter > 0) {
+                // vectors from center point to outer points
+                const vec0 = [s.outerPoints[0][0] - s.centerPoint[0], s.outerPoints[0][1] - s.centerPoint[1]]
+                const vec1 = [s.outerPoints[1][0] - s.centerPoint[0], s.outerPoints[1][1] - s.centerPoint[1]]
+
+                // segment fill points
+                const fillPoint0 = [s.centerPoint[0] + closestQuarter * vec0[0], s.centerPoint[1] + closestQuarter * vec0[1]]
+                const fillPoint1 = [s.centerPoint[0] + closestQuarter * vec1[0], s.centerPoint[1] + closestQuarter * vec1[1]]
+
+                d += `M${s.centerPoint[0]},${s.centerPoint[1]}`
+                d += `L${fillPoint0[0]},${fillPoint0[1]}`
+                d += `L${fillPoint1[0]},${fillPoint1[1]}`
+                d += `Z`
+            }
+
+            return d
+        })
+        .attr("stroke", "none")
+        .attr("fill", s => tableau20[s.classIndex])
+
+    // segment lines
+    contentGroup.selectAll(".glyph-segment-lines")
+        .data(segmentData)
+        .enter()
+        .append("path")
+        .attr("class", "glyph-segment-lines")
+        .attr("d", s => {
+            // vectors from center point to outer points
+            const vec0 = [s.outerPoints[0][0] - s.centerPoint[0], s.outerPoints[0][1] - s.centerPoint[1]]
+            const vec1 = [s.outerPoints[1][0] - s.centerPoint[0], s.outerPoints[1][1] - s.centerPoint[1]]
+
+            let d = ``
+
+            for (let i = 1; i <= 3; i++) {
+                const quarterPoint0 = [s.centerPoint[0] + i/4 * vec0[0], s.centerPoint[1] + i/4 * vec0[1]]
+                const quarterPoint1 = [s.centerPoint[0] + i/4 * vec1[0], s.centerPoint[1] + i/4 * vec1[1]]
+
+                d += `M${quarterPoint0[0]},${quarterPoint0[1]}`
+                d += `L${quarterPoint1[0]},${quarterPoint1[1]}`
+            }
+
+            return d
+        })
+        .attr("stroke", "lightgray")
+        .attr("stroke-width", strokeWidth)
+        .attr("fill", "none")
+
+
 }
 
 
@@ -328,6 +394,25 @@ export function drawPartialFillGlyphs(contentGroup, xScale, yScale, feature_colu
 
     // segment fills
     drawGlyphFillsPartial(contentGroup, segmentData)
+
+    // glyph lines (outline and segment borders)
+    drawGlyphLines(contentGroup, glyphData, strokeWidth)
+
+    // details overlay on click
+    overlayOnClick(contentGroup, glyphSize, glyphData)
+}
+
+
+export function drawSegmentFillGlyphs(contentGroup, xScale, yScale, feature_column) {
+    const { glyphSize, glyphBoundingSize } = getGlyphSize(xScale, yScale)
+    const { glyphData, segmentData } = calculateGlyphData(xScale, yScale, glyphSize, glyphBoundingSize, feature_column)
+    const strokeWidth = getStrokeWidth()
+
+    // removing old glyphs
+    clearGlyphs(contentGroup)
+
+    // segment fills
+    drawGlyphFillsSegments(contentGroup, segmentData, strokeWidth)
 
     // glyph lines (outline and segment borders)
     drawGlyphLines(contentGroup, glyphData, strokeWidth)
