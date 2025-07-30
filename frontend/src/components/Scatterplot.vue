@@ -53,10 +53,11 @@ onMounted(async () => {
 
   // chart setup and watch update
   setupChart(chart, chart_width, chart_height, factorX, factorY)
+  updateChart()
+
   watch(
       [settings.useDGrid, settings.dimensionalityReduction, settings.glyphType],
       () => updateChart(),
-      { immediate: true }
   )
   watch(
       [settings.modelName, settings.dataType],
