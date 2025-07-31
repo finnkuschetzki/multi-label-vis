@@ -478,7 +478,7 @@ export function drawWhiskerGlyphs(contentGroup, xScale, yScale, feature_column) 
     clearGlyphs(contentGroup)
 
     // segment fills
-    drawGlyphFillsBinary(contentGroup, segmentData)
+    drawGlyphFillsBinary(contentGroup, segmentData, binarizedPredictionColor)
 
     // glyph lines (outline and segment borders)
     drawGlyphLines(contentGroup, glyphData, strokeWidth)
