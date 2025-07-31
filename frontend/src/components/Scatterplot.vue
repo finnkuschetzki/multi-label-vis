@@ -1,7 +1,7 @@
 <script setup>
 import Overlay from "@/components/Overlay.vue"
 
-import { ref, onMounted, nextTick, watch } from "vue"
+import { ref, useTemplateRef, watch, nextTick } from "vue"
 import { useElementSize } from "@vueuse/core"
 
 import httpClient from "@/httpClient/httpClient.js"
@@ -12,25 +12,31 @@ import { showOverlay, overlayPosition } from "@/stores/overlay.js"
 import { setupChart, updateChart } from "@/chart/base.js"
 
 
-// standard settings
+// --- default settings ---
+
 showOverlay.value = false
 
 
-const container = ref()
-const chart = ref()
+// --- template refs
 
-let chart_width, chart_height, factorX, factorY
+const container = useTemplateRef("container")
+const chart = useTemplateRef("chart")
+
+
+// --- scatterplot setup ---
+
+const isLoading = ref(true)
 
 
 async function requestData() {
-  await nextTick()
+  console.log("data requested")
 
   // getting container size and calculating factors
   const { width, height } = useElementSize(container)
-  chart_width = width.value * 0.995
-  chart_height = height.value * 0.995
-  factorX = chart_width / chart_height
-  factorY = 1
+  const chart_width = width.value * 0.995
+  const chart_height = height.value * 0.995
+  const factorX = chart_width / chart_height
+  const factorY = 1
 
   // requesting data
   const res = await httpClient.get("data/", {
@@ -43,35 +49,44 @@ async function requestData() {
   })
 
   data.value = res.data
+
+  console.log("data received")
   console.log(data.value)
 
-  await nextTick()
+  return { chart_width, chart_height, factorX, factorY }
 }
 
-onMounted(async () => {
-  await requestData()
 
-  // chart setup and watch update
+async function setup() {
+  isLoading.value = true
+  await nextTick()
+
+  const { chart_width, chart_height, factorX, factorY } = await requestData()
+
+  isLoading.value = false
+  await nextTick()
+
+  // initial chart setup
   setupChart(chart, chart_width, chart_height, factorX, factorY)
   updateChart()
 
+  // watch for setting changes that do not need data request
   watch(
       [settings.useDGrid, settings.dimensionalityReduction, settings.glyphType],
       () => updateChart(),
   )
-  watch(
-      [settings.modelName, settings.dataType],
-      async () => { await requestData(); updateChart() },
-  )
-})
+}
+
+
+defineExpose({ setup })
 </script>
 
 <template>
   <div class="chart-container" ref="container">
 
-    <div v-if="data" id="chart" ref="chart"></div>
+    <div v-if="!isLoading" id="chart" ref="chart"></div>
     <Overlay
-        v-if="data"
+        v-if="!isLoading"
         class="floating-overlay"
         :class="{
           'visible': showOverlay,

@@ -1,7 +1,7 @@
 <script setup>
 import * as d3 from "d3"
 
-import { ref, useTemplateRef, onMounted, watch } from "vue"
+import { useTemplateRef } from "vue"
 
 import httpClient from "@/httpClient/httpClient.js"
 
@@ -16,7 +16,12 @@ const tableau20 = [
 ]
 
 
+// --- template refs ---
+
 const legendGlyphs = useTemplateRef("legendGlyphs")
+
+
+// --- legend glyphs ---
 
 function calculateGlyphPoints() {
   const numClasses = classInfo.value.length
@@ -38,6 +43,7 @@ function calculateGlyphPoints() {
 
   return { mx, my, circlePoints }
 }
+
 
 function createLegendGlyph(legendGlyph, glyphPoints, i) {
   const numClasses = classInfo.value.length
@@ -98,37 +104,33 @@ function createLegendGlyph(legendGlyph, glyphPoints, i) {
 }
 
 
-const isInitialized = ref(false)
-
+// --- legend setup ---
 
 async function requestClassInfo() {
+  console.log("class info requested")
+
   const res = await httpClient.get("class-info/", {
     params: {
       "modelName": settings.modelName.value
     }
   })
+
   classInfo.value = res.data
+
+  console.log("class info received")
   console.log(classInfo.value)
 }
 
-onMounted(async () => {
-  watch(
-      settings.modelName,
-      async () => {
-        await requestClassInfo()
 
-        const glyphPoints = calculateGlyphPoints()
-        legendGlyphs.value.forEach((el, i) => createLegendGlyph(el, glyphPoints, i))
+async function setup() {
+  await requestClassInfo()
 
-        isInitialized.value = true
-      },
-      { immediate: true }
-  )
-
-})
+  const glyphPoints = calculateGlyphPoints()
+  legendGlyphs.value.forEach((el, i) => createLegendGlyph(el, glyphPoints, i))
+}
 
 
-defineExpose(isInitialized)
+defineExpose({ setup })
 </script>
 
 <template>

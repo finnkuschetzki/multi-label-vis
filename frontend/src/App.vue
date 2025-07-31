@@ -3,13 +3,36 @@ import Menu from "@/components/Menu.vue"
 import Scatterplot from "@/components/Scatterplot.vue"
 import Legend from "@/components/Legend.vue"
 
-import { useTemplateRef } from "vue"
+import { ref, useTemplateRef, onMounted, watch, nextTick } from "vue"
 
-/*
-Scatterplot computes the space available for the chart (onMounted) to request fitting data from backend.
-Therefore, Legend must be rendered with its final size before Scatterplot can be mounted.
- */
-const isLegendInitialized = useTemplateRef("isLegendInitialized")
+
+import * as settings from "@/stores/settings.js"
+
+
+const legend = useTemplateRef("legend")
+const scatterplot = useTemplateRef("scatterplot")
+
+
+const displayScatterplot = ref(false)
+
+
+onMounted(async () => {
+  watch(
+      [settings.modelName, settings.dataType],
+      async () => {
+        displayScatterplot.value = false
+        await nextTick()
+
+        await legend.value.setup()
+        displayScatterplot.value = true
+        await nextTick()
+
+        await scatterplot.value.setup()
+      },
+      { immediate: true }
+  )
+
+})
 </script>
 
 <template>
@@ -17,10 +40,10 @@ const isLegendInitialized = useTemplateRef("isLegendInitialized")
 
     <div class="sidebar">
       <Menu />
-      <Legend ref="isLegendInitialized" />
+      <Legend ref="legend" />
     </div>
 
-    <Scatterplot v-if="isLegendInitialized" />
+    <Scatterplot v-if="displayScatterplot" ref="scatterplot" />
 
   </div>
 </template>
