@@ -24,6 +24,7 @@ const dimensionalityReductionOptions = [
 ]
 const glyphTypeOptions = [
   { name: "Simple", value: "simple" },
+  { name: "Ground Truth", value: "groundTruth" },
   { name: "Binary", value: "binary" },
   { name: "Partial Fill", value: "partialFill" },
   { name: "Segment Fill", value: "segmentFill" },

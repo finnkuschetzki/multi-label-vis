@@ -144,6 +144,11 @@ function drawGlyphLines(contentGroup, glyphData, strokeWidth) {
 }
 
 
+function groundTruthColor(s) {
+    return s.groundTruth ? tableau20[s.classIndex] : "none"
+}
+
+
 function binarizedPredictionColor(s) {
     return s.binarizedPrediction ? tableau20[s.classIndex] : "none"
 }
@@ -379,6 +384,25 @@ export function drawSimpleGlyphs(contentGroup, xScale, yScale, feature_column) {
 
     // simple glyphs
     drawCircles(contentGroup, glyphSize, glyphData)
+
+    // details overlay on click
+    overlayOnClick(contentGroup, glyphSize, glyphData)
+}
+
+
+export function drawGroundTruthGlyphs(contentGroup, xScale, yScale, feature_column) {
+    const { glyphSize, glyphBoundingSize } = getGlyphSize(xScale, yScale)
+    const { glyphData, segmentData } = calculateGlyphData(xScale, yScale, glyphSize, glyphBoundingSize, feature_column)
+    const strokeWidth = getStrokeWidth()
+
+    // removing old glyphs
+    clearGlyphs(contentGroup)
+
+    // segment fills
+    drawGlyphFillsBinary(contentGroup, segmentData, groundTruthColor)
+
+    // glyph lines (outline and segment borders)
+    drawGlyphLines(contentGroup, glyphData, strokeWidth)
 
     // details overlay on click
     overlayOnClick(contentGroup, glyphSize, glyphData)

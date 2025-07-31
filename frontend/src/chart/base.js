@@ -4,6 +4,7 @@ import * as settings from "@/stores/settings.js"
 import { margin } from "@/chart/settings.js"
 import {
     drawSimpleGlyphs,
+    drawGroundTruthGlyphs,
     drawBinaryGlyphs,
     drawPartialFillGlyphs,
     drawSegmentFillGlyphs,
@@ -66,6 +67,9 @@ export function updateChart() {
         case "simple":
             drawSimpleGlyphs(contentGroup, xScale, yScale, feature_column)
             break
+        case "groundTruth":
+            drawGroundTruthGlyphs(contentGroup, xScale, yScale, feature_column)
+            break;
         case "binary":
             drawBinaryGlyphs(contentGroup, xScale, yScale, feature_column)
             break
