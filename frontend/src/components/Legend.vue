@@ -1,5 +1,7 @@
 <script setup>
-import { ref, onMounted, watch } from "vue"
+import * as d3 from "d3"
+
+import { ref, useTemplateRef, onMounted, watch } from "vue"
 
 import httpClient from "@/httpClient/httpClient.js"
 
@@ -13,6 +15,89 @@ const tableau20 = [
   "#59a14f", "#86bcb6", "#d37295", "#d7b5a6"
 ]
 
+
+const legendGlyphs = useTemplateRef("legendGlyphs")
+
+function calculateGlyphPoints() {
+  const numClasses = classInfo.value.length
+  const glyphSize = 14
+
+  const initialRadians = 3 / 2 * Math.PI
+  const classStep = (2 * Math.PI) / numClasses
+
+  const mx = 8
+  const my = 8
+
+  const circlePoints = []
+  for (let i = 0; i < numClasses; i++) {
+    circlePoints.push([
+      mx + Math.cos(initialRadians + classStep * i) * glyphSize/2,  // x pos
+      my + Math.sin(initialRadians + classStep * i) * glyphSize/2  // y pos
+    ])
+  }
+
+  return { mx, my, circlePoints }
+}
+
+function createLegendGlyph(legendGlyph, glyphPoints, i) {
+  const numClasses = classInfo.value.length
+
+  // clearing old legendGlyph
+  d3.select(legendGlyph).selectAll("*").remove()
+
+  // creating new legendGlyph
+  const svg = d3.select(legendGlyph).append("svg")
+      .attr("width", 16)
+      .attr("height", 16)
+      .append("g")
+
+  const { mx, my, circlePoints } = glyphPoints
+
+  // glyph lines
+  svg.append("path")
+      .attr("d", () => {
+        let d = ``
+
+        // segment borders
+        for (let i = 0; i < circlePoints.length; i++) {
+          d += `M${mx},${my}`
+          d += `L${circlePoints[i][0]},${circlePoints[i][1]}`
+        }
+
+        // outline
+        d += `M${circlePoints[0][0]},${circlePoints[0][1]}`  // move to first point
+        for (let i = 1; i < circlePoints.length; i++) {
+          d += `L${circlePoints[i][0]},${circlePoints[i][1]}`  // lines to other points
+        }
+        d += `Z`  // complete to first point
+
+        return d
+      })
+      .attr("stroke", "black")
+      .attr("stroke-width", 0.2)
+      .attr("fill", "none")
+
+  // glyph fill
+  svg.append("path")
+      .attr("d", () => {
+        let d = ``
+
+        const circlePoint0 = circlePoints[i]
+        const circlePoint1 = circlePoints[(i+1) % numClasses]
+
+        // segment fill
+        d += `M${mx},${my}`
+        d += `L${circlePoint0[0]},${circlePoint0[1]}`
+        d += `L${circlePoint1[0]},${circlePoint1[1]}`
+        d += `Z`
+
+        return d
+      })
+      .attr("stroke", "none")
+      .attr("fill", () => tableau20[i])
+}
+
+
 const isInitialized = ref(false)
 
 
@@ -23,16 +108,23 @@ async function requestClassInfo() {
     }
   })
   classInfo.value = res.data
-
-  isInitialized.value = true
+  console.log(classInfo.value)
 }
 
 onMounted(async () => {
-  await requestClassInfo()
+  watch(
+      settings.modelName,
+      async () => {
+        await requestClassInfo()
 
-  watch(settings.modelName, async () => {
-    await requestClassInfo()
-  })
+        const glyphPoints = calculateGlyphPoints()
+        legendGlyphs.value.forEach((el, i) => createLegendGlyph(el, glyphPoints, i))
+
+        isInitialized.value = true
+      },
+      { immediate: true }
+  )
+
 })
 
 
@@ -46,8 +138,9 @@ defineExpose(isInitialized)
     <template #title>Color Legend</template>
     <template #content>
 
-      <div v-for="(c, index) of classInfo" class="class-item">
+      <div v-for="(c, index) of classInfo" :key="index" class="class-item">
 
+        <span class="legend-glyph" ref="legendGlyphs"></span>
         <span class="color-box" :style="{ backgroundColor: tableau20[index] }"></span>
         <span>{{ c["name"] }}</span>
 
@@ -75,6 +168,12 @@ defineExpose(isInitialized)
   display: flex;
   align-items: center;
   gap: 4px;
+}
+
+.legend-glyph {
+  display: inline-block;
+  width: 16px;
+  height: 16px;
 }
 
 .color-box {
