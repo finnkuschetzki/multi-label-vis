@@ -2,6 +2,7 @@ import { ref } from "vue"
 
 export const modelName = ref()
 export const dataType = ref()
+export const glyphData = ref()
 
 export const useDGrid = ref()
 export const dimensionalityReduction = ref()

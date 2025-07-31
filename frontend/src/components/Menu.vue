@@ -1,5 +1,5 @@
 <script setup>
-import { ref } from "vue";
+import { ref, computed, watch } from "vue"
 
 import config from "../../../config.json"
 
@@ -11,31 +11,54 @@ const visible = ref()
 
 // options
 const modelNameOptions = config.models.map(m => {
-  return { "label": m.displayName, "value": m.name }
+  return { label: m.displayName, value: m.name }
 })
 const dataTypeOptions = [
-  { name: "Training", value: "train" },
-  { name: "Validation", value: "val" }
+  { label: "Training", value: "train" },
+  { label: "Validation", value: "val" }
+]
+const glyphDataOptions = [
+  { label: "Simple", value: "simple" },
+  { label: "Ground Truth", value: "groundTruth" },
+  { label: "Predictions", value: "predictions" },
+  { label: "Comparison", value: "comparison" }
 ]
 const dimensionalityReductionOptions = [
-  { name: "PCA", value: "pca" },
-  { name: "UMAP", value: "umap" },
-  { name: "t-SNE", value: "tsne" }
+  { label: "PCA", value: "pca" },
+  { label: "UMAP", value: "umap" },
+  { label: "t-SNE", value: "tsne" }
 ]
-const glyphTypeOptions = [
-  { name: "Simple", value: "simple" },
-  { name: "Ground Truth", value: "groundTruth" },
-  { name: "Binary", value: "binary" },
-  { name: "Partial Fill", value: "partialFill" },
-  { name: "Segment Fill", value: "segmentFill" },
-  { name: "Whisker", value: "whisker" },
-  { name: "Comparison", value: "comparison" }
-]
+const glyphTypeOptions = computed(() => {
+  switch (settings.glyphData.value) {
+    case "simple":
+      return [
+        { label: "Simple", value: "simple" }
+      ]
+    case "groundTruth":
+      return [
+        { label: "Ground Truth", value: "groundTruth" }
+      ]
+    case "predictions":
+      return [
+        { label: "Binary", value: "binary" },
+        { label: "Partial Fill", value: "partialFill" },
+        { label: "Segment Fill", value: "segmentFill" },
+        { label: "Whisker", value: "whisker" }
+      ]
+    case "comparison":
+      return [
+        { label: "Comparison", value: "comparison" }
+      ]
+  }
+})
+
+watch(glyphTypeOptions, (newGlyphTypeOptions) => settings.glyphType.value = newGlyphTypeOptions[0].value)
 
 // standard settings
 data.value = null
 settings.modelName.value = modelNameOptions[0].value
 settings.dataType.value = "val"
+settings.glyphData.value = "simple"
 settings.useDGrid.value = true
 settings.dimensionalityReduction.value = "pca"
 settings.glyphType.value = "simple"
@@ -62,9 +85,19 @@ settings.glyphType.value = "simple"
         <SelectButton
           v-model="settings.dataType"
           :options="dataTypeOptions"
-          option-label="name"
+          option-label="label"
           option-value="value"
           :allow-empty="false"
+        />
+      </div>
+
+      <div>
+        <SelectButton
+            v-model="settings.glyphData"
+            :options="glyphDataOptions"
+            option-label="label"
+            option-value="value"
+            :allow-empty="false"
         />
       </div>
 
@@ -79,7 +112,7 @@ settings.glyphType.value = "simple"
         <SelectButton
             v-model="settings.dimensionalityReduction"
             :options="dimensionalityReductionOptions"
-            option-label="name"
+            option-label="label"
             option-value="value"
             :allow-empty="false"
         />
@@ -87,11 +120,11 @@ settings.glyphType.value = "simple"
 
       <div>
         <SelectButton
-          v-model="settings.glyphType"
-          :options="glyphTypeOptions"
-          option-label="name"
-          option-value="value"
-          :allow-empty="false"
+            v-model="settings.glyphType"
+            :options="glyphTypeOptions"
+            option-label="label"
+            option-value="value"
+            :allow-empty="false"
         />
       </div>
 
