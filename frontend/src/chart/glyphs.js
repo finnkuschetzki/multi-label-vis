@@ -258,7 +258,7 @@ function drawGlyphSegmentLines(contentGroup, glyphData, strokeWidth) {
 
             return d
         })
-        .attr("stroke", "lightgray")
+        .attr("stroke", "silver")
         .attr("stroke-width", strokeWidth)
         .attr("fill", "none")
 }

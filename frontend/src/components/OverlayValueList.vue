@@ -30,9 +30,9 @@ const props = defineProps({
 
       <span class="class-item">
         <span class="color-box" :style="{ backgroundColor: tableau20[i] }"></span>
-        <span :style="{ color: val >= 0.5 ? 'black' : 'gray' }">{{ classInfo[i].name }}:</span>
+        <span :style="{ color: val >= 0.5 ? 'black' : 'silver' }">{{ classInfo[i].name }}:</span>
       </span>
-      <span :style="{ color: val >= 0.5 ? 'black' : 'gray' }">{{ val.toFixed(props.decimalDigits) }}</span>
+      <span :style="{ color: val >= 0.5 ? 'black' : 'silver' }">{{ val.toFixed(props.decimalDigits) }}</span>
 
     </div>
 
