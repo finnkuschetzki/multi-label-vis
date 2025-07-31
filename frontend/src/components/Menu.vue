@@ -27,7 +27,8 @@ const glyphTypeOptions = [
   { name: "Binary", value: "binary" },
   { name: "Partial Fill", value: "partialFill" },
   { name: "Segment Fill", value: "segmentFill" },
-  { name: "Whisker", value: "whisker" }
+  { name: "Whisker", value: "whisker" },
+  { name: "Comparison", value: "comparison" }
 ]
 
 // standard settings

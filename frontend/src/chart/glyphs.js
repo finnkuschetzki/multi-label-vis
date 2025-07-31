@@ -144,7 +144,25 @@ function drawGlyphLines(contentGroup, glyphData, strokeWidth) {
 }
 
 
-function drawGlyphFillsBinary(contentGroup, segmentData) {
+function binarizedPredictionColor(s) {
+    return s.binarizedPrediction ? tableau20[s.classIndex] : "none"
+}
+
+
+function comparisonColor(s) {
+    if (s.groundTruth && s.binarizedPrediction) {
+        return "darkgray"
+    } else if (s.groundTruth) {
+        return "red"
+    } else if (s.binarizedPrediction) {
+        return "dodgerblue"
+    } else {
+        return "none"
+    }
+}
+
+
+function drawGlyphFillsBinary(contentGroup, segmentData, fillColorFunc) {
     contentGroup.selectAll(".glyph-segment-fills")
         .data(segmentData)
         .enter()
@@ -162,7 +180,7 @@ function drawGlyphFillsBinary(contentGroup, segmentData) {
             return d
         })
         .attr("stroke", "none")
-        .attr("fill", s => s.binarizedPrediction ? tableau20[s.classIndex] : "none")
+        .attr("fill", s => fillColorFunc(s))
 }
 
 
@@ -376,7 +394,7 @@ export function drawBinaryGlyphs(contentGroup, xScale, yScale, feature_column) {
     clearGlyphs(contentGroup)
 
     // segment fills
-    drawGlyphFillsBinary(contentGroup, segmentData)
+    drawGlyphFillsBinary(contentGroup, segmentData, binarizedPredictionColor)
 
     // glyph lines (outline and segment borders)
     drawGlyphLines(contentGroup, glyphData, strokeWidth)
@@ -443,6 +461,25 @@ export function drawWhiskerGlyphs(contentGroup, xScale, yScale, feature_column) 
 
     // whiskers
     drawGlyphWhiskers(contentGroup, segmentData, strokeWidth)
+
+    // details overlay on click
+    overlayOnClick(contentGroup, glyphSize, glyphData)
+}
+
+
+export function drawComparisonGlyphs(contentGroup, xScale, yScale, feature_column) {
+    const { glyphSize, glyphBoundingSize } = getGlyphSize(xScale, yScale)
+    const { glyphData, segmentData } = calculateGlyphData(xScale, yScale, glyphSize, glyphBoundingSize, feature_column)
+    const strokeWidth = getStrokeWidth()
+
+    // removing old glyphs
+    clearGlyphs(contentGroup)
+
+    // segment fills
+    drawGlyphFillsBinary(contentGroup, segmentData, comparisonColor)
+
+    // glyph lines (outline and segment borders)
+    drawGlyphLines(contentGroup, glyphData, strokeWidth)
 
     // details overlay on click
     overlayOnClick(contentGroup, glyphSize, glyphData)
