@@ -230,26 +230,30 @@ function drawGlyphFillsSegments(contentGroup, segmentData, strokeWidth) {
         })
         .attr("stroke", "none")
         .attr("fill", s => tableau20[s.classIndex])
+}
 
-    // segment lines
+
+function drawGlyphSegmentLines(contentGroup, glyphData, strokeWidth) {
     contentGroup.selectAll(".glyph-segment-lines")
-        .data(segmentData)
+        .data(glyphData)
         .enter()
         .append("path")
         .attr("class", "glyph-segment-lines")
-        .attr("d", s => {
-            // vectors from center point to outer points
-            const vec0 = [s.outerPoints[0][0] - s.centerPoint[0], s.outerPoints[0][1] - s.centerPoint[1]]
-            const vec1 = [s.outerPoints[1][0] - s.centerPoint[0], s.outerPoints[1][1] - s.centerPoint[1]]
+        .attr("d", g => {
+            // vectors from center point to circle points
+            const circlePointsVec = g.circlePoints.map(cp => [cp[0] - g.mx, cp[1] - g.my])
 
             let d = ``
 
+            // draw three circles of segment lines
             for (let i = 1; i <= 3; i++) {
-                const quarterPoint0 = [s.centerPoint[0] + i/4 * vec0[0], s.centerPoint[1] + i/4 * vec0[1]]
-                const quarterPoint1 = [s.centerPoint[0] + i/4 * vec1[0], s.centerPoint[1] + i/4 * vec1[1]]
 
-                d += `M${quarterPoint0[0]},${quarterPoint0[1]}`
-                d += `L${quarterPoint1[0]},${quarterPoint1[1]}`
+                d += `M${g.mx + i/4 * circlePointsVec[0][0]},${g.my + i/4 * circlePointsVec[0][1]}`  // move to first point
+                for (let j = 1; j < circlePointsVec.length; j++) {
+                    d += `L${g.mx + i/4 * circlePointsVec[j][0]},${g.my + i/4 * circlePointsVec[j][1]}`  // lines to other points
+                }
+                d += `Z`  // complete to first point
+
             }
 
             return d
@@ -257,8 +261,6 @@ function drawGlyphFillsSegments(contentGroup, segmentData, strokeWidth) {
         .attr("stroke", "lightgray")
         .attr("stroke-width", strokeWidth)
         .attr("fill", "none")
-
-
 }
 
 
@@ -413,6 +415,9 @@ export function drawSegmentFillGlyphs(contentGroup, xScale, yScale, feature_colu
 
     // segment fills
     drawGlyphFillsSegments(contentGroup, segmentData, strokeWidth)
+
+    // segment lines
+    drawGlyphSegmentLines(contentGroup, glyphData, strokeWidth)
 
     // glyph lines (outline and segment borders)
     drawGlyphLines(contentGroup, glyphData, strokeWidth)
