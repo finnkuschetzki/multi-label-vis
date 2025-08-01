@@ -30,18 +30,18 @@ function calculateGlyphPoints() {
   const initialRadians = 3 / 2 * Math.PI
   const classStep = (2 * Math.PI) / numClasses
 
-  const mx = 8
-  const my = 8
+  const cx = 8
+  const cy = 8
 
   const circlePoints = []
   for (let i = 0; i < numClasses; i++) {
     circlePoints.push([
-      mx + Math.cos(initialRadians + classStep * i) * glyphSize/2,  // x pos
-      my + Math.sin(initialRadians + classStep * i) * glyphSize/2  // y pos
+      cx + Math.cos(initialRadians + classStep * i) * glyphSize/2,  // x pos
+      cy + Math.sin(initialRadians + classStep * i) * glyphSize/2  // y pos
     ])
   }
 
-  return { mx, my, circlePoints }
+  return { cx, cy, circlePoints }
 }
 
 
@@ -57,7 +57,7 @@ function createLegendGlyph(legendGlyph, glyphPoints, i) {
       .attr("height", 16)
       .append("g")
 
-  const { mx, my, circlePoints } = glyphPoints
+  const { cx, cy, circlePoints } = glyphPoints
 
   // glyph lines
   svg.append("path")
@@ -66,7 +66,7 @@ function createLegendGlyph(legendGlyph, glyphPoints, i) {
 
         // segment borders
         for (let i = 0; i < circlePoints.length; i++) {
-          d += `M${mx},${my}`
+          d += `M${cx},${cy}`
           d += `L${circlePoints[i][0]},${circlePoints[i][1]}`
         }
 
@@ -92,7 +92,7 @@ function createLegendGlyph(legendGlyph, glyphPoints, i) {
         const circlePoint1 = circlePoints[(i+1) % numClasses]
 
         // segment fill
-        d += `M${mx},${my}`
+        d += `M${cx},${cy}`
         d += `L${circlePoint0[0]},${circlePoint0[1]}`
         d += `L${circlePoint1[0]},${circlePoint1[1]}`
         d += `Z`

@@ -41,17 +41,17 @@ function calculateGlyphData(xScale, yScale, glyphSize, glyphBoundingSize, featur
     const classStep = (2 * Math.PI) / numClasses
 
     data.value.forEach(d => {
-        const cx = xScale(d[featureColumn][0]) + margin.left
-        const cy = yScale(d[featureColumn][1]) + margin.bottom
+        const x = xScale(d[featureColumn][0]) + margin.left
+        const y = yScale(d[featureColumn][1]) + margin.bottom
 
-        const mx = cx + glyphBoundingSize/2
-        const my = cy + glyphBoundingSize/2
+        const cx = x + glyphBoundingSize/2
+        const cy = y + glyphBoundingSize/2
 
         const circlePoints = []
         for (let i = 0; i < numClasses; i++) {
             circlePoints.push([
-                mx + Math.cos(initialRadians + classStep * i) * glyphSize/2,  // x pos
-                my + Math.sin(initialRadians + classStep * i) * glyphSize/2  // y pos
+                cx + Math.cos(initialRadians + classStep * i) * glyphSize/2,  // x pos
+                cy + Math.sin(initialRadians + classStep * i) * glyphSize/2  // y pos
             ])
         }
 
@@ -59,7 +59,7 @@ function calculateGlyphData(xScale, yScale, glyphSize, glyphBoundingSize, featur
         for (let i = 0; i < circlePoints.length; i++) {
             segments.push({
                 "classIndex": i,
-                "centerPoint": [mx, my],
+                "centerPoint": [cx, cy],
                 "outerPoints": [circlePoints[i], circlePoints[(i+1) % numClasses]],
                 "groundTruth": d["ground_truth"][i],
                 "prediction": d["predictions"][i],
@@ -68,10 +68,10 @@ function calculateGlyphData(xScale, yScale, glyphSize, glyphBoundingSize, featur
         }
 
         glyphData.push({
+            "x": x,
+            "y": y,
             "cx": cx,
             "cy": cy,
-            "mx": mx,
-            "my": my,
             "circlePoints": circlePoints,
             "segments": segments,
             "imagePath": d["image_path"],
@@ -125,7 +125,7 @@ function drawGlyphLines(contentGroup, glyphData, strokeWidth) {
 
             // segment borders
             for (let i = 0; i < g.circlePoints.length; i++) {
-                d += `M${g.mx},${g.my}`
+                d += `M${g.cx},${g.cy}`
                 d += `L${g.circlePoints[i][0]},${g.circlePoints[i][1]}`
             }
 
@@ -264,16 +264,16 @@ function drawGlyphSegmentLines(contentGroup, glyphData, strokeWidth) {
         .attr("class", "glyph-segment-lines")
         .attr("d", g => {
             // vectors from center point to circle points
-            const circlePointsVec = g.circlePoints.map(cp => [cp[0] - g.mx, cp[1] - g.my])
+            const circlePointsVec = g.circlePoints.map(cp => [cp[0] - g.cx, cp[1] - g.cy])
 
             let d = ``
 
             // draw three circles of segment lines
             for (let i = 1; i <= 3; i++) {
 
-                d += `M${g.mx + i/4 * circlePointsVec[0][0]},${g.my + i/4 * circlePointsVec[0][1]}`  // move to first point
+                d += `M${g.cx + i/4 * circlePointsVec[0][0]},${g.cy + i/4 * circlePointsVec[0][1]}`  // move to first point
                 for (let j = 1; j < circlePointsVec.length; j++) {
-                    d += `L${g.mx + i/4 * circlePointsVec[j][0]},${g.my + i/4 * circlePointsVec[j][1]}`  // lines to other points
+                    d += `L${g.cx + i/4 * circlePointsVec[j][0]},${g.cy + i/4 * circlePointsVec[j][1]}`  // lines to other points
                 }
                 d += `Z`  // complete to first point
 
@@ -347,8 +347,8 @@ export function overlayOnClick(contentGroup, glyphSize, glyphData) {
         .enter()
         .append("rect")
         .attr("class", "glyph-event.box")
-        .attr("x", d => d.cx)
-        .attr("y", d => d.cy)
+        .attr("x", d => d.x)
+        .attr("y", d => d.y)
         .attr("width", glyphSize)
         .attr("height", glyphSize)
         .attr("stroke", "none")
