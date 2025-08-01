@@ -86,11 +86,11 @@ settings.glyphType.value = "simple"
   >
     <div class="menu-container">
 
-      <Select v-model="settings.modelName" :options="modelNameOptions" option-label="label" option-value="value" />
+      <Select v-model="settings.modelName.value" :options="modelNameOptions" option-label="label" option-value="value" />
 
       <div>
         <SelectButton
-          v-model="settings.dataType"
+          v-model="settings.dataType.value"
           :options="dataTypeOptions"
           option-label="label"
           option-value="value"
@@ -100,7 +100,7 @@ settings.glyphType.value = "simple"
 
       <div>
         <SelectButton
-            v-model="settings.glyphData"
+            v-model="settings.glyphData.value"
             :options="glyphDataOptions"
             option-label="label"
             option-value="value"
@@ -112,12 +112,12 @@ settings.glyphType.value = "simple"
 
       <div class="toggle-switch">
         <label for="d-grid-toggle">DGrid</label>
-        <ToggleSwitch v-model="settings.useDGrid" inputId="d-grid-toggle" />
+        <ToggleSwitch v-model="settings.useDGrid.value" inputId="d-grid-toggle" />
       </div>
 
       <div>
         <SelectButton
-            v-model="settings.dimensionalityReduction"
+            v-model="settings.dimensionalityReduction.value"
             :options="dimensionalityReductionOptions"
             option-label="label"
             option-value="value"
@@ -127,7 +127,7 @@ settings.glyphType.value = "simple"
 
       <div>
         <SelectButton
-            v-model="settings.glyphType"
+            v-model="settings.glyphType.value"
             :options="glyphTypeOptions"
             option-label="label"
             option-value="value"
