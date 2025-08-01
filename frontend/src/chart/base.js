@@ -94,13 +94,10 @@ export function updateChart() {
     clearConvexHulls(contentGroup)
 
     for (let classIndex of settings.convexHullIndices.value) {
-        console.log(settings.convexHullIndices.value, classIndex)
         if (settings.glyphData.value === "groundTruth") {
             drawConvexHull(contentGroup, xScale, yScale, feature_column, "ground_truth", classIndex)
         } else if (settings.glyphData.value === "predictions") {
             drawConvexHull(contentGroup, xScale, yScale, feature_column, "predictions", classIndex)
         }
     }
-
-
 }
