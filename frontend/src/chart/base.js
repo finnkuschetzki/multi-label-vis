@@ -11,6 +11,7 @@ import {
     drawWhiskerGlyphs,
     drawComparisonGlyphs
 } from "@/chart/glyphs.js"
+import { clearConvexHulls, drawConvexHull } from "@/chart/convexHulls.js";
 
 
 let svg, xScale, yScale, contentGroup, zoom
@@ -63,6 +64,8 @@ export function updateChart() {
     let feature_column = `${settings.dimensionalityReduction.value}_features`;
     if (settings.useDGrid.value) feature_column += "_or"
 
+
+    // glyphs
     switch (settings.glyphType.value) {
         case "simple":
             drawSimpleGlyphs(contentGroup, xScale, yScale, feature_column)
@@ -86,4 +89,18 @@ export function updateChart() {
             drawComparisonGlyphs(contentGroup, xScale, yScale, feature_column)
             break;
     }
+
+    // convex hulls
+    clearConvexHulls(contentGroup)
+
+    for (let classIndex of settings.convexHullIndices.value) {
+        console.log(settings.convexHullIndices.value, classIndex)
+        if (settings.glyphData.value === "groundTruth") {
+            drawConvexHull(contentGroup, xScale, yScale, feature_column, "ground_truth", classIndex)
+        } else if (settings.glyphData.value === "predictions") {
+            drawConvexHull(contentGroup, xScale, yScale, feature_column, "predictions", classIndex)
+        }
+    }
+
+
 }

@@ -3,8 +3,15 @@ import { ref, computed, watch } from "vue"
 
 import config from "../../../config.json"
 
-import { data } from "@/stores/data.js"
+import { classInfo, data } from "@/stores/data.js"
 import * as settings from "@/stores/settings.js"
+
+
+const tableau20 = [
+  "#4e79a7", "#8cd17d", "#e15759", "#fabfd2", "#a0cbe8", "#b6992d", "#ff9d9a", "#b07aa1",
+  "#f28e2b", "#f1ce63", "#79706e", "#d4a6c8", "#ffbe7d", "#499894", "#bab0ac", "#9d7660",
+  "#59a14f", "#86bcb6", "#d37295", "#d7b5a6"
+]
 
 
 const visible = ref()
@@ -128,6 +135,16 @@ settings.glyphType.value = "simple"
         />
       </div>
 
+      <Divider />
+
+      <div v-if="classInfo && (settings.glyphData.value === 'groundTruth' || settings.glyphData.value === 'predictions')">
+        <div v-for="(c, index) in classInfo" class="class-item" :key="index">
+          <Checkbox v-model="settings.convexHullIndices.value" size="small" :value="index" />
+          <span class="color-box" :style="{ backgroundColor: tableau20[index] }"></span>
+          <span>{{ c["name"] }}</span>
+        </div>
+      </div>
+
     </div>
   </Drawer>
 </template>
@@ -157,5 +174,18 @@ settings.glyphType.value = "simple"
   display: flex;
   align-items: center;
   gap: 0.5rem;
+}
+
+.class-item {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.color-box {
+  display: inline-block;
+  width: 16px;
+  height: 16px;
+  border-radius: 4px;
 }
 </style>

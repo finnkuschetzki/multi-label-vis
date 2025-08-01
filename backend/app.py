@@ -1,9 +1,10 @@
 import os
 import json
-from flask import Flask, request, send_file
+from flask import Flask, request, jsonify, send_file
 from flask_cors import CORS
 
 from process_data import *
+from convex_hull import *
 
 
 # frontend expects Flask App on port 5001
@@ -90,12 +91,22 @@ def data():
     else:
         raise ValueError("Type must be 'train' or 'val'")
 
+    # overlap removal
     if x_factor is None or y_factor is None:
         or_df = apply_overlap_removal(df, glyph_size)
     else:
         or_df = apply_overlap_removal(df, glyph_size, x_factor, y_factor)
+    data_points = or_df.to_dict(orient="records")
 
-    return or_df.to_json(orient="records")
+    # convex hulls
+    convex_hulls = calculate_convex_hulls(or_df)
+
+    response_dict = {
+        "data_points": data_points,
+        "convex_hulls": convex_hulls,
+    }
+
+    return jsonify(response_dict)
 
 
 @app.route("/image/")

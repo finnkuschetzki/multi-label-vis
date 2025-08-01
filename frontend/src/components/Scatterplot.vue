@@ -6,7 +6,7 @@ import { useElementSize } from "@vueuse/core"
 
 import httpClient from "@/httpClient/httpClient.js"
 
-import { data } from "@/stores/data.js"
+import { data, convexHulls } from "@/stores/data.js"
 import * as settings from "@/stores/settings.js"
 import { showOverlay, overlayPosition } from "@/stores/overlay.js"
 import { setupChart, updateChart } from "@/chart/base.js"
@@ -48,10 +48,12 @@ async function requestData() {
     }
   })
 
-  data.value = res.data
+  data.value = res.data["data_points"]
+  convexHulls.value = res.data["convex_hulls"]
 
   console.log("data received")
   console.log(data.value)
+  console.log(convexHulls.value)
 
   return { chart_width, chart_height, factorX, factorY }
 }
@@ -72,7 +74,7 @@ async function setup() {
 
   // watch for setting changes that do not need data request
   watch(
-      [settings.useDGrid, settings.dimensionalityReduction, settings.glyphType],
+      [settings.useDGrid, settings.dimensionalityReduction, settings.glyphType, settings.convexHullIndices],
       () => updateChart(),
   )
 }
