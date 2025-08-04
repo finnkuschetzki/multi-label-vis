@@ -10,6 +10,8 @@ import {
 import { margin, tableau20 } from "@/chart/settings.js"
 import { getGlyphSize, getNumClasses, getStrokeWidth } from "@/chart/units.js";
 
+import * as settings from "@/stores/settings.js"
+
 
 
 /* CALCULATIONS */
@@ -24,6 +26,22 @@ function calculateGlyphData(xScale, yScale, glyphSize, glyphBoundingSize, featur
     const classStep = (2 * Math.PI) / numClasses
 
     data.value.forEach(d => {
+        // setting focused if there is at least one focus index
+        let focusFeature, focused
+
+        if (settings.glyphData.value === "groundTruth") {
+            focusFeature = "ground_truth"
+        } else if (settings.glyphData.value === "predictions") {
+            focusFeature = "binarized_predictions"
+        }
+
+        if (!focusFeature || settings.focusIndices.value.length === 0) {
+            focused = true
+        } else {
+            focused = settings.focusIndices.value.some(i => d[focusFeature][i])
+        }
+
+        // calculating glyph data
         const x = xScale(d[featureColumn][0]) + margin.left
         const y = yScale(d[featureColumn][1]) + margin.bottom
 
@@ -46,7 +64,8 @@ function calculateGlyphData(xScale, yScale, glyphSize, glyphBoundingSize, featur
                 "outerPoints": [circlePoints[i], circlePoints[(i+1) % numClasses]],
                 "groundTruth": d["ground_truth"][i],
                 "prediction": d["predictions"][i],
-                "binarizedPrediction": d["binarized_predictions"][i]
+                "binarizedPrediction": d["binarized_predictions"][i],
+                "focused": focused
             })
         }
 
@@ -59,7 +78,8 @@ function calculateGlyphData(xScale, yScale, glyphSize, glyphBoundingSize, featur
             "segments": segments,
             "imagePath": d["image_path"],
             "groundTruth": d["ground_truth"],
-            "predictions": d["predictions"]
+            "predictions": d["predictions"],
+            "focused": focused
         })
     })
 
@@ -93,7 +113,7 @@ function drawCircles(contentGroup, glyphSize, glyphData) {
         .attr("cy", g => g.cy)
         .attr("r", glyphSize / 2)
         .attr("stroke", "none")
-        .attr("fill", "black")
+        .attr("fill", g => g.focused ? "black" : "lightgray")
 }
 
 
@@ -121,7 +141,7 @@ function drawGlyphLines(contentGroup, glyphData, strokeWidth) {
 
             return d
         })
-        .attr("stroke", "black")
+        .attr("stroke", g => g.focused ? "black" : "silver")
         .attr("stroke-width", strokeWidth)
         .attr("fill", "none")
 }
@@ -169,6 +189,7 @@ function drawGlyphFillsBinary(contentGroup, segmentData, fillColorFunc) {
         })
         .attr("stroke", "none")
         .attr("fill", s => fillColorFunc(s))
+        .attr("fill-opacity", s => s.focused ? 1.0 : 0.3)
 }
 
 
@@ -200,6 +221,7 @@ function drawGlyphFillsPartial(contentGroup, segmentData) {
         .attr("stroke", "none")
         // todo cutoff at 0.1 prediction to increase performance of web app
         .attr("fill", s => s.prediction >= 0.1 ? tableau20[s.classIndex] : "none")
+        .attr("fill-opacity", s => s.focused ? 1.0 : 0.3)
 }
 
 
@@ -236,6 +258,7 @@ function drawGlyphFillsSegments(contentGroup, segmentData) {
         })
         .attr("stroke", "none")
         .attr("fill", s => tableau20[s.classIndex])
+        .attr("fill-opacity", s => s.focused ? 1.0 : 0.3)
 }
 
 
@@ -314,7 +337,7 @@ function drawGlyphWhiskers(contentGroup, segmentData, strokeWidth) {
                 return ""
             }
         })
-        .attr("stroke", "black")
+        .attr("stroke", s => s.focused ? "black" : "silver")
         .attr("stroke-width", strokeWidth)
         .attr("fill", "none")
 }

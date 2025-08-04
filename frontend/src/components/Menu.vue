@@ -146,6 +146,16 @@ settings.glyphType.value = "simple"
           </div>
         </div>
 
+        <Divider v-if="classInfo && (settings.glyphData.value === 'groundTruth' || settings.glyphData.value === 'predictions')" />
+
+        <div v-if="classInfo && (settings.glyphData.value === 'groundTruth' || settings.glyphData.value === 'predictions')">
+          <div v-for="(c, index) in classInfo" class="class-item" :key="index">
+            <Checkbox v-model="settings.focusIndices.value" size="small" :value="index" />
+            <span class="color-box" :style="{ backgroundColor: tableau20[index] }"></span>
+            <span>{{ c["name"] }}</span>
+          </div>
+        </div>
+
       </div>
     </ScrollPanel>
   </Drawer>

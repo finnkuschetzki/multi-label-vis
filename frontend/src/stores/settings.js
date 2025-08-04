@@ -9,3 +9,4 @@ export const dimensionalityReduction = ref()
 export const glyphType = ref()
 
 export const convexHullIndices = ref([])
+export const focusIndices = ref([])
