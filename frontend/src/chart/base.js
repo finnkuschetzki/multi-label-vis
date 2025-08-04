@@ -64,6 +64,16 @@ export function updateChart() {
     let feature_column = `${settings.dimensionalityReduction.value}_features`;
     if (settings.useDGrid.value) feature_column += "_or"
 
+    // convex hulls
+    clearConvexHulls(contentGroup)
+
+    for (let classIndex of settings.convexHullIndices.value) {
+        if (settings.glyphData.value === "groundTruth") {
+            drawConvexHull(contentGroup, xScale, yScale, feature_column, "ground_truth", classIndex)
+        } else if (settings.glyphData.value === "predictions") {
+            drawConvexHull(contentGroup, xScale, yScale, feature_column, "predictions", classIndex)
+        }
+    }
 
     // glyphs
     switch (settings.glyphType.value) {
@@ -88,16 +98,5 @@ export function updateChart() {
         case "comparison":
             drawComparisonGlyphs(contentGroup, xScale, yScale, feature_column)
             break;
-    }
-
-    // convex hulls
-    clearConvexHulls(contentGroup)
-
-    for (let classIndex of settings.convexHullIndices.value) {
-        if (settings.glyphData.value === "groundTruth") {
-            drawConvexHull(contentGroup, xScale, yScale, feature_column, "ground_truth", classIndex)
-        } else if (settings.glyphData.value === "predictions") {
-            drawConvexHull(contentGroup, xScale, yScale, feature_column, "predictions", classIndex)
-        }
     }
 }
