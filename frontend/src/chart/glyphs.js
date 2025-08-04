@@ -203,7 +203,7 @@ function drawGlyphFillsPartial(contentGroup, segmentData) {
 }
 
 
-function drawGlyphFillsSegments(contentGroup, segmentData, strokeWidth) {
+function drawGlyphFillsSegments(contentGroup, segmentData) {
     // segment fill
     contentGroup.selectAll(".glyph-segment-fills")
         .data(segmentData)
@@ -212,19 +212,19 @@ function drawGlyphFillsSegments(contentGroup, segmentData, strokeWidth) {
         .attr("class", "glyph-segment-fills")
         .attr("d", s => {
             // calculate approximate fill
-            const closestQuarter = Math.round(s.prediction * 4) / 4
+            const closestQuintile = Math.round(s.prediction * 5) / 5
 
             // draw approximate fill
             let d = ``
 
-            if (closestQuarter > 0) {
+            if (closestQuintile > 0) {
                 // vectors from center point to outer points
                 const vec0 = [s.outerPoints[0][0] - s.centerPoint[0], s.outerPoints[0][1] - s.centerPoint[1]]
                 const vec1 = [s.outerPoints[1][0] - s.centerPoint[0], s.outerPoints[1][1] - s.centerPoint[1]]
 
                 // segment fill points
-                const fillPoint0 = [s.centerPoint[0] + closestQuarter * vec0[0], s.centerPoint[1] + closestQuarter * vec0[1]]
-                const fillPoint1 = [s.centerPoint[0] + closestQuarter * vec1[0], s.centerPoint[1] + closestQuarter * vec1[1]]
+                const fillPoint0 = [s.centerPoint[0] + closestQuintile * vec0[0], s.centerPoint[1] + closestQuintile * vec0[1]]
+                const fillPoint1 = [s.centerPoint[0] + closestQuintile * vec1[0], s.centerPoint[1] + closestQuintile * vec1[1]]
 
                 d += `M${s.centerPoint[0]},${s.centerPoint[1]}`
                 d += `L${fillPoint0[0]},${fillPoint0[1]}`
@@ -252,11 +252,11 @@ function drawGlyphSegmentLines(contentGroup, glyphData, strokeWidth) {
             let d = ``
 
             // draw three circles of segment lines
-            for (let i = 1; i <= 3; i++) {
+            for (let i = 1; i <= 4; i++) {
 
-                d += `M${g.cx + i/4 * circlePointsVec[0][0]},${g.cy + i/4 * circlePointsVec[0][1]}`  // move to first point
+                d += `M${g.cx + i/5 * circlePointsVec[0][0]},${g.cy + i/5 * circlePointsVec[0][1]}`  // move to first point
                 for (let j = 1; j < circlePointsVec.length; j++) {
-                    d += `L${g.cx + i/4 * circlePointsVec[j][0]},${g.cy + i/4 * circlePointsVec[j][1]}`  // lines to other points
+                    d += `L${g.cx + i/5 * circlePointsVec[j][0]},${g.cy + i/5 * circlePointsVec[j][1]}`  // lines to other points
                 }
                 d += `Z`  // complete to first point
 
@@ -439,7 +439,7 @@ export function drawSegmentFillGlyphs(contentGroup, xScale, yScale, feature_colu
     clearGlyphs(contentGroup)
 
     // segment fills
-    drawGlyphFillsSegments(contentGroup, segmentData, strokeWidth)
+    drawGlyphFillsSegments(contentGroup, segmentData)
 
     // segment lines
     drawGlyphSegmentLines(contentGroup, glyphData, strokeWidth)
