@@ -84,68 +84,70 @@ settings.glyphType.value = "simple"
         }
       }"
   >
-    <div class="menu-container">
+    <ScrollPanel>
+      <div class="menu-container">
 
-      <Select v-model="settings.modelName.value" :options="modelNameOptions" option-label="label" option-value="value" />
+        <Select v-model="settings.modelName.value" :options="modelNameOptions" option-label="label" option-value="value" />
 
-      <div>
-        <SelectButton
-          v-model="settings.dataType.value"
-          :options="dataTypeOptions"
-          option-label="label"
-          option-value="value"
-          :allow-empty="false"
-        />
-      </div>
-
-      <div>
-        <SelectButton
-            v-model="settings.glyphData.value"
-            :options="glyphDataOptions"
+        <div>
+          <SelectButton
+            v-model="settings.dataType.value"
+            :options="dataTypeOptions"
             option-label="label"
             option-value="value"
             :allow-empty="false"
-        />
-      </div>
-
-      <Divider />
-
-      <div class="toggle-switch">
-        <label for="d-grid-toggle">DGrid</label>
-        <ToggleSwitch v-model="settings.useDGrid.value" inputId="d-grid-toggle" />
-      </div>
-
-      <div>
-        <SelectButton
-            v-model="settings.dimensionalityReduction.value"
-            :options="dimensionalityReductionOptions"
-            option-label="label"
-            option-value="value"
-            :allow-empty="false"
-        />
-      </div>
-
-      <div>
-        <SelectButton
-            v-model="settings.glyphType.value"
-            :options="glyphTypeOptions"
-            option-label="label"
-            option-value="value"
-            :allow-empty="false"
-        />
-      </div>
-
-      <Divider />
-
-      <div v-if="classInfo && (settings.glyphData.value === 'groundTruth' || settings.glyphData.value === 'predictions')">
-        <div v-for="(c, index) in classInfo" class="class-item" :key="index">
-          <Checkbox v-model="settings.convexHullIndices.value" size="small" :value="index" />
-          <span class="color-box" :style="{ backgroundColor: tableau20[index] }"></span>
-          <span>{{ c["name"] }}</span>
+          />
         </div>
-      </div>
 
-    </div>
+        <div>
+          <SelectButton
+              v-model="settings.glyphData.value"
+              :options="glyphDataOptions"
+              option-label="label"
+              option-value="value"
+              :allow-empty="false"
+          />
+        </div>
+
+        <Divider />
+
+        <div class="toggle-switch">
+          <label for="d-grid-toggle">DGrid</label>
+          <ToggleSwitch v-model="settings.useDGrid.value" inputId="d-grid-toggle" />
+        </div>
+
+        <div>
+          <SelectButton
+              v-model="settings.dimensionalityReduction.value"
+              :options="dimensionalityReductionOptions"
+              option-label="label"
+              option-value="value"
+              :allow-empty="false"
+          />
+        </div>
+
+        <div>
+          <SelectButton
+              v-model="settings.glyphType.value"
+              :options="glyphTypeOptions"
+              option-label="label"
+              option-value="value"
+              :allow-empty="false"
+          />
+        </div>
+
+        <Divider />
+
+        <div v-if="classInfo && (settings.glyphData.value === 'groundTruth' || settings.glyphData.value === 'predictions')">
+          <div v-for="(c, index) in classInfo" class="class-item" :key="index">
+            <Checkbox v-model="settings.convexHullIndices.value" size="small" :value="index" />
+            <span class="color-box" :style="{ backgroundColor: tableau20[index] }"></span>
+            <span>{{ c["name"] }}</span>
+          </div>
+        </div>
+
+      </div>
+    </ScrollPanel>
   </Drawer>
 </template>
 
