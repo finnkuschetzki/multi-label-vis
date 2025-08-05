@@ -19,6 +19,7 @@ function resetOverlay() {
 }
 
 
+const menu = useTemplateRef("menu")
 const legend = useTemplateRef("legend")
 const scatterplot = useTemplateRef("scatterplot")
 
@@ -34,6 +35,7 @@ onMounted(async () => {
         resetOverlay()
         await nextTick()
 
+        await menu.value.resetIndices()
         await legend.value.setup()
         displayScatterplot.value = true
         await nextTick()
@@ -50,7 +52,7 @@ onMounted(async () => {
   <div class="main-container">
 
     <div class="sidebar">
-      <Menu />
+      <Menu ref="menu" />
       <Legend ref="legend" />
     </div>
 

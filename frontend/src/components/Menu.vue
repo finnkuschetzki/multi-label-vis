@@ -69,6 +69,16 @@ settings.glyphData.value = "simple"
 settings.useDGrid.value = true
 settings.dimensionalityReduction.value = "pca"
 settings.glyphType.value = "simple"
+
+
+async function resetIndices() {
+  settings.convexHullIndices.value = []
+  settings.focusIndices.value = []
+  // options will refresh automatically on classInfo change
+}
+
+
+defineExpose({ resetIndices })
 </script>
 
 <template>
