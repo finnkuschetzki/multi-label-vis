@@ -1,6 +1,6 @@
 import { convexHulls } from "@/stores/data.js"
 import { margin, tableau20 } from "@/chart/settings.js"
-import { getGlyphSize } from "@/chart/units.js";
+import { getGlyphSize, getStrokeWidth } from "@/chart/units.js";
 
 
 export function clearConvexHulls(contentGroup) {
@@ -10,6 +10,7 @@ export function clearConvexHulls(contentGroup) {
 
 export function drawConvexHull(contentGroup, xScale, yScale, featureColumn, label, classIndex) {
     const { glyphSize, glyphBoundingSize } = getGlyphSize(xScale, yScale)
+    const strokeWidth = getStrokeWidth()
 
     const points = convexHulls.value[featureColumn][label][classIndex].map(p => [
         xScale(p[0]) + margin.left + glyphBoundingSize/2,
@@ -32,7 +33,7 @@ export function drawConvexHull(contentGroup, xScale, yScale, featureColumn, labe
             return d
         })
         .attr("stroke", tableau20[classIndex])
-        .attr("stroke-width", 1)
+        .attr("stroke-width", strokeWidth * 10)
         .attr("fill", tableau20[classIndex])
         .attr("fill-opacity", 0.25)
 }
