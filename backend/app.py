@@ -38,6 +38,9 @@ def load_or_apply_and_save(model_name, model_path, data_type):
         data_.to_csv(f"computed_model_data/{model_name}/{data_type}_data.csv", index=False)
     return data_
 
+if not os.path.isdir(f"computed_model_data"):
+    os.mkdir(f"computed_model_data")
+
 for model in config["models"]:
     if not os.path.isdir(f"computed_model_data/{model["name"]}"):
         os.mkdir(f"computed_model_data/{model["name"]}")
