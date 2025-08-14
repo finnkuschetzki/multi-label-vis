@@ -3,7 +3,7 @@ import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
 from keras import models
-from sklearn.metrics import accuracy_score, precision_score, recall_score
+from sklearn.metrics import accuracy_score, precision_score, recall_score, f1_score
 
 from _command_line_tools import *
 from _preprocess import *
@@ -49,6 +49,7 @@ for i in range(num_train_classes):
     accuracy = accuracy_score(y_true_class, y_pred_class)
     precision = precision_score(y_true_class, y_pred_class, zero_division=0)
     recall = recall_score(y_true_class, y_pred_class, zero_division=0)
+    f1 = f1_score(y_true_class, y_pred_class, zero_division=0)
 
     metrics_per_classes.append({
         "cat_id": multi_hot_index_to_category_id[i],
@@ -56,6 +57,7 @@ for i in range(num_train_classes):
         "accuracy": accuracy,
         "precision": precision,
         "recall": recall,
+        "f1": f1,
         "image_count": np.sum(y_true_class),
     })
 
@@ -64,6 +66,7 @@ for i in range(num_train_classes):
     print(f"  Accuracy: {accuracy:.4f}")
     print(f"  Precision: {precision:.4f}")
     print(f"  Recall: {recall:.4f}")
+    print(f"  F1-score: {f1:.4f}")
 
 
 # --- overall metrics ---
@@ -80,6 +83,9 @@ overall_weighted_precision = precision_score(all_y_true, all_y_pred, zero_divisi
 overall_micro_recall = recall_score(all_y_true, all_y_pred, zero_division=0, average="micro")
 overall_macro_recall = recall_score(all_y_true, all_y_pred, zero_division=0, average="macro")
 overall_weighted_recall = recall_score(all_y_true, all_y_pred, zero_division=0, average="weighted")
+overall_micro_f1 = f1_score(all_y_true, all_y_pred, zero_division=0, average="micro")
+overall_macro_f1 = f1_score(all_y_true, all_y_pred, zero_division=0, average="macro")
+overall_weighted_f1 = f1_score(all_y_true, all_y_pred, zero_division=0, average="weighted")
 
 print("Overall Metrics:")
 print(f"  Accuracy: {overall_accuracy:.4f}")
@@ -89,6 +95,9 @@ print(f"  Weighted Precision: {overall_weighted_precision:.4f}")
 print(f"  Micro Recall: {overall_micro_recall:.4f}")
 print(f"  Macro Recall: {overall_macro_recall:.4f}")
 print(f"  Weighted Recall: {overall_weighted_recall:.4f}")
+print(f"  Micro F1: {overall_micro_f1:.4f}")
+print(f"  Macro F1: {overall_macro_f1:.4f}")
+print(f"  Weighted F1: {overall_weighted_f1:.4f}")
 
 
 # --- saving metrics ---
@@ -97,7 +106,7 @@ directory = f"{MODEL_DIR}/val_stats"
 if not os.path.exists(directory):
     os.makedirs(directory)
 
-df = pd.DataFrame(metrics_per_classes, columns=["cat_id", "cat_name", "accuracy", "precision", "recall", "image_count"])
+df = pd.DataFrame(metrics_per_classes, columns=["cat_id", "cat_name", "accuracy", "precision", "recall", "f1", "image_count"])
 df.to_csv(f"{directory}/metrics_per_classes.csv", index=False)
 
 
@@ -105,7 +114,7 @@ df.to_csv(f"{directory}/metrics_per_classes.csv", index=False)
 
 print()
 
-metrics = ["accuracy", "precision", "recall"]
+metrics = ["accuracy", "precision", "recall", "f1"]
 class_names = [class_metrics["cat_name"] for class_metrics in metrics_per_classes]
 image_counts = [class_metrics["image_count"] for class_metrics in metrics_per_classes]
 
