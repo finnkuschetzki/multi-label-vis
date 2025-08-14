@@ -54,7 +54,7 @@ def apply_dimensionality_reduction(in_df):
     start = time.time()
 
     print("UMAP...")
-    umap = UMAP()
+    umap = UMAP(n_components=2, random_state=42)
     umap_features = umap.fit_transform(standardized_features)
     scaled_umap_features = min_max_scaler.fit_transform(umap_features)
     out_df["umap_features"] = scaled_umap_features.tolist()
@@ -68,7 +68,7 @@ def apply_dimensionality_reduction(in_df):
     start = time.time()
 
     print("t-SNE...")
-    tsne = TSNE(n_components=2)
+    tsne = TSNE(n_components=2, random_state=42)
     tsne_features = tsne.fit_transform(standardized_features)
     scaled_tsne_features = min_max_scaler.fit_transform(tsne_features)
     out_df["tsne_features"] = scaled_tsne_features.tolist()

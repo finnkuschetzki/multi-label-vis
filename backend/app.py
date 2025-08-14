@@ -10,6 +10,10 @@ from convex_hull import *
 # frontend expects Flask App on port 5001
 
 
+# only for development
+_INCLUDE_TRAIN_DATA = True
+
+
 # --- load config ---
 
 with open("../config.json", "r") as f:
@@ -44,12 +48,19 @@ if not os.path.isdir(f"computed_model_data"):
 for model in config["models"]:
     if not os.path.isdir(f"computed_model_data/{model["name"]}"):
         os.mkdir(f"computed_model_data/{model["name"]}")
-    train_data = load_or_apply_and_save(model["name"], model["path"], "train")
-    val_data = load_or_apply_and_save(model["name"], model["path"], "val")
-    models_dict[model["name"]] = {
-        "data": { "train": train_data, "val": val_data },
-        "glyph_size": model["glyphSize"],
-    }
+    if _INCLUDE_TRAIN_DATA:
+        train_data = load_or_apply_and_save(model["name"], model["path"], "train")
+        val_data = load_or_apply_and_save(model["name"], model["path"], "val")
+        models_dict[model["name"]] = {
+            "data": { "train": train_data, "val": val_data },
+            "glyph_size": model["glyphSize"],
+        }
+    else:  # only for development
+        val_data = load_or_apply_and_save(model["name"], model["path"], "val")
+        models_dict[model["name"]] = {
+            "data": {"val": val_data },
+            "glyph_size": model["glyphSize"],
+        }
 
 
 # --- load class info ---
