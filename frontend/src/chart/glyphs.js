@@ -170,7 +170,21 @@ function comparisonColor(s) {
 }
 
 
-function drawGlyphFillsBinary(contentGroup, segmentData, fillColorFunc) {
+function focusOpacity(s) {
+    return s.focused ? 1.0 : 0.3
+}
+
+
+function comparisonOpacity(s) {
+    if (s.binarizedPrediction) {
+        return s.prediction / 2
+    } else {
+        return 1 - s.prediction * 2
+    }
+}
+
+
+function drawGlyphFillsBinary(contentGroup, segmentData, fillColorFunc, fillOpacityFunc) {
     contentGroup.selectAll(".glyph-segment-fills")
         .data(segmentData)
         .enter()
@@ -189,7 +203,7 @@ function drawGlyphFillsBinary(contentGroup, segmentData, fillColorFunc) {
         })
         .attr("stroke", "none")
         .attr("fill", s => fillColorFunc(s))
-        .attr("fill-opacity", s => s.focused ? 1.0 : 0.3)
+        .attr("fill-opacity", s => fillOpacityFunc(s))
 }
 
 
@@ -405,7 +419,7 @@ export function drawGroundTruthGlyphs(contentGroup, xScale, yScale, feature_colu
     clearGlyphs(contentGroup)
 
     // segment fills
-    drawGlyphFillsBinary(contentGroup, segmentData, groundTruthColor)
+    drawGlyphFillsBinary(contentGroup, segmentData, groundTruthColor, focusOpacity)
 
     // glyph lines (outline and segment borders)
     drawGlyphLines(contentGroup, glyphData, strokeWidth)
@@ -424,7 +438,7 @@ export function drawBinaryGlyphs(contentGroup, xScale, yScale, feature_column) {
     clearGlyphs(contentGroup)
 
     // segment fills
-    drawGlyphFillsBinary(contentGroup, segmentData, binarizedPredictionColor)
+    drawGlyphFillsBinary(contentGroup, segmentData, binarizedPredictionColor, focusOpacity)
 
     // glyph lines (outline and segment borders)
     drawGlyphLines(contentGroup, glyphData, strokeWidth)
@@ -484,7 +498,7 @@ export function drawWhiskerGlyphs(contentGroup, xScale, yScale, feature_column) 
     clearGlyphs(contentGroup)
 
     // segment fills
-    drawGlyphFillsBinary(contentGroup, segmentData, binarizedPredictionColor)
+    drawGlyphFillsBinary(contentGroup, segmentData, binarizedPredictionColor, focusOpacity)
 
     // glyph lines (outline and segment borders)
     drawGlyphLines(contentGroup, glyphData, strokeWidth)
@@ -506,7 +520,7 @@ export function drawComparisonGlyphs(contentGroup, xScale, yScale, feature_colum
     clearGlyphs(contentGroup)
 
     // segment fills
-    drawGlyphFillsBinary(contentGroup, segmentData, comparisonColor)
+    drawGlyphFillsBinary(contentGroup, segmentData, comparisonColor, comparisonOpacity)
 
     // glyph lines (outline and segment borders)
     drawGlyphLines(contentGroup, glyphData, strokeWidth)
