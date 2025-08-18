@@ -1,4 +1,6 @@
 <script setup>
+import InfoItem from "@/components/InfoItem.vue";
+
 import { ref, computed, watch } from "vue"
 
 import config from "../../../config.json"
@@ -103,7 +105,19 @@ defineExpose({ resetIndices })
     <ScrollPanel>
       <div class="menu-container">
 
-        <Select v-model="settings.modelName.value" :options="modelNameOptions" option-label="label" option-value="value" />
+        <div>
+          <Select v-model="settings.modelName.value" :options="modelNameOptions" option-label="label" option-value="value" />
+          <InfoItem header="Dataset">
+            <p>
+              Datasets are subsets from the COCO dataset.
+            </p>
+            <ul>
+              <li><i>Electronic, Furniture, Kitchen</i>: all classes from superclasses "electronic", "furniture", "kitchen"</li>
+              <li><i>Person, Sports, Vehicle</i>: all classes from superclasses "person", "sports", "vehicle"</li>
+              <li><i>Top 20 classes</i>: top 20 classes from the COCO dataset with the highest number of images</li>
+            </ul>
+          </InfoItem>
+        </div>
 
         <div>
           <SelectButton
@@ -113,6 +127,12 @@ defineExpose({ resetIndices })
             option-value="value"
             :allow-empty="false"
           />
+          <InfoItem header="Data Partition">
+            <ul>
+              <li><i>Training</i>: contains all data points from training data</li>
+              <li><i>Validation</i>: contains all data points from validation data</li>
+            </ul>
+          </InfoItem>
         </div>
 
         <div>
@@ -123,13 +143,26 @@ defineExpose({ resetIndices })
               option-value="value"
               :allow-empty="false"
           />
+          <InfoItem header="Data Type">
+            <ul>
+              <li><i>Simple</i>: shows only data points positions</li>
+              <li><i>Ground Truth</i>: encodes ground truth labels in glyphs</li>
+              <li><i>Predictions</i>: encodes predictions from the image classifier in glyphs</li>
+              <li><i>Comparison</i>: encodes correct classifications and misclassifications in glyphs</li>
+            </ul>
+          </InfoItem>
         </div>
 
         <Divider />
 
-        <div class="toggle-switch">
+        <div class="toggle-switch-container">
           <label for="d-grid-toggle">DGrid</label>
-          <ToggleSwitch v-model="settings.useDGrid.value" inputId="d-grid-toggle" />
+          <ToggleSwitch v-model="settings.useDGrid.value" inputId="d-grid-toggle" class="toggle-switch" />
+          <InfoItem header="Overlap Removal">
+            <p>
+              Toggles whether overlap removal using DGrid algorithm is applied.
+            </p>
+          </InfoItem>
         </div>
 
         <div>
@@ -140,6 +173,18 @@ defineExpose({ resetIndices })
               option-value="value"
               :allow-empty="false"
           />
+          <InfoItem header="Dimensionality Reduction">
+            <p>
+              Data points features are extracted from the image classifiers feature layer (last dense layer).
+              These features are dimensionally-reduced using the selected dimensionality reduction technique.
+              Resulting two-dimensional embeddings are used as position for the data point.
+            </p>
+            <ul>
+              <li><i>PCA</i>: Principal Component Analysis (linear, global)</li>
+              <li><i>UMAP</i>: Uniform Manifold Approximation and Projection (non-linear, local)</li>
+              <li><i>t-SNE</i>: t-Distributed Stochastic Neighbor Embedding (non-linear, local)</li>
+            </ul>
+          </InfoItem>
         </div>
 
         <div>
@@ -150,13 +195,63 @@ defineExpose({ resetIndices })
               option-value="value"
               :allow-empty="false"
           />
+          <InfoItem header="Glyph Type">
+            <div v-if="settings.glyphData.value === 'simple'">
+              <ul>
+                <li><i>Simple</i>: circular glyph</li>
+              </ul>
+            </div>
+            <div v-else-if="settings.glyphData.value === 'groundTruth'">
+              <p>
+                Glyphs are composed from sectors. Each sector is associated with a label, encoded by sector position and color.
+              </p>
+              <ul>
+                <li><i>Ground Truth</i>: sectors are filled, if associated labels are in ground truth</li>
+              </ul>
+            </div>
+            <div v-else-if="settings.glyphData.value === 'predictions'">
+              <p>
+                Glyphs are composed from sectors. Each sector is associated with a label, encoded by sector position and color.
+              </p>
+              <ul>
+                <li><i>Binary</i>: sectors are filled, if associated labels are in predictions</li>
+                <li><i>Partial Fill</i>: sectors are filled linearly along the sectors middle line,
+                  according to their predicted probability (full fill corresponds to probability 1.0, empty fill
+                  corresponds to probability 0.0, note: labels count as predicted if their probability is greater
+                  than 0.5), all sectors are shown in their associated color</li>
+                <li><i>Segment Fill</i>: sectors are divided into five segments, segments are filled to the approximate predicted probability</li>
+              </ul>
+            </div>
+            <div v-else-if="settings.glyphData.value === 'comparison'">
+              <p>
+                Glyphs are composed from sectors. Each sector is associated with a label, encoded by sector position.
+                Sector color is gray if label is in both ground truth and prediction, red if label is only ground truth, blue if label is only in prediction.
+              </p>
+              <ul>
+                <li><i>Binary</i>: sectors are filled, color is assigned as described above</li>
+                <li><i>Opacity</i>: if a sectors associated is a misclassification (either red or blue color), the
+                  sectors opacity maps to the error from a correct classification result, high opacity corresponds to
+                  high error (example: a sector whose label has a probability of 0.45 (not predicted) but is in ground
+                  truth has a low opacity, corresponding to a low error; a sector whose label has a probability of 0.1
+                  (not predicted) but is in ground truth has a high opacity, corresponding to a high error)</li>
+              </ul>
+            </div>
+          </InfoItem>
         </div>
 
         <Divider />
 
         <div v-if="classInfo && (settings.glyphData.value === 'groundTruth' || settings.glyphData.value === 'predictions')" class="column-flex">
           <div>
-            <div class="list-title">Convex Hull</div>
+            <div class="title-row">
+              <div class="list-title">Convex Hull</div>
+              <InfoItem header="Convex Hull">
+                <p>
+                  For each of the selected labels, the convex hull enclosing all data points associated with that label
+                  (either in ground truth or predictions, as selected) is shown. Convex hulls are shown in the labels associated color.
+                </p>
+              </InfoItem>
+            </div>
             <div v-for="(c, index) in classInfo" class="class-item" :key="index">
               <Checkbox v-model="settings.convexHullIndices.value" size="small" :value="index" />
               <span class="color-box" :style="{ backgroundColor: tableau20[index] }"></span>
@@ -168,7 +263,19 @@ defineExpose({ resetIndices })
 
           <div>
 
-            <div class="list-title">Focus</div>
+            <div class="title-row">
+              <div class="list-title">Focus</div>
+              <InfoItem header="Focus on data points">
+                <p>
+                  Data points associated with the selected labels are focused. Choose between:
+                </p>
+                <ul>
+                  <li><i>union</i> (focus data points associated with at least one selected label)</li>
+                  <li><i>intersection</i> (focus data points associated with all selected labels)</li>
+                </ul>
+                <p>Select these options below the list of labels.</p>
+              </InfoItem>
+            </div>
             <div v-for="(c, index) in classInfo" class="class-item" :key="index">
               <Checkbox v-model="settings.focusIndices.value" size="small" :value="index" />
               <span class="color-box" :style="{ backgroundColor: tableau20[index] }"></span>
@@ -212,10 +319,17 @@ defineExpose({ resetIndices })
   margin: 0.75rem 1.5rem;
 }
 
-.toggle-switch {
+li {
+  margin: .1rem;
+}
+
+.toggle-switch-container {
   display: flex;
   align-items: center;
-  gap: 0.5rem;
+}
+
+.toggle-switch {
+  margin-left: 0.5rem;
 }
 
 .class-item {
@@ -237,8 +351,12 @@ defineExpose({ resetIndices })
   justify-content: space-around;
 }
 
+.title-row {
+  display: flex;
+  align-items: center;
+}
+
 .list-title {
-  margin-bottom: 0.25rem;
   font-weight: bold;
 }
 
