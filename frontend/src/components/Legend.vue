@@ -151,6 +151,36 @@ defineExpose({ setup })
     </template>
   </Card>
 
+  <Card v-if="settings.glyphData.value === 'comparison'">
+    <template #content>
+
+      <div class="misclassification-item">
+        <div class="opacity-bar" :class="{
+          'red-static': settings.glyphType.value === 'comparison-binary',
+          'red-gradient': settings.glyphType.value === 'comparison-opacity'
+         }"></div>
+        <div>ground truth</div>
+        <div>not prediction</div>
+      </div>
+
+      <div class="misclassification-item">
+        <div class="opacity-bar gray-static"></div>
+        <div>ground truth</div>
+        <div>prediction</div>
+      </div>
+
+      <div class="misclassification-item">
+        <div class="opacity-bar" :class="{
+          'blue-static': settings.glyphType.value === 'comparison-binary',
+          'blue-gradient': settings.glyphType.value === 'comparison-opacity'
+         }"></div>
+        <div>not ground truth</div>
+        <div>prediction</div>
+      </div>
+
+    </template>
+  </Card>
+
  </div>
 </template>
 
@@ -158,7 +188,7 @@ defineExpose({ setup })
 .legend-container {
   display: flex;
   flex-direction: column;
-  align-items: center;
+  align-items: stretch;
   margin-top: 0.75rem;
 }
 
@@ -183,5 +213,49 @@ defineExpose({ setup })
   width: 16px;
   height: 16px;
   border-radius: 4px;
+}
+
+.misclassification-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.misclassification-item:not(:last-child) {
+  margin-bottom: 12px;
+}
+
+.opacity-bar {
+  height: 16px;
+  width: 100%;
+  margin-bottom: 4px;
+}
+
+.red-static {
+  background-color: red;
+}
+
+.red-gradient {
+  background: linear-gradient(
+    to right,
+    rgba(255, 0, 0, 0),
+    rgba(255, 0, 0, 255)
+  );
+}
+
+.gray-static {
+  background-color: darkgray;
+}
+
+.blue-static {
+  background-color: dodgerblue;
+}
+
+.blue-gradient {
+  background: linear-gradient(
+    to right,
+    rgba(30, 143, 255, 0),
+    rgba(30, 143, 255, 255)
+  );
 }
 </style>
