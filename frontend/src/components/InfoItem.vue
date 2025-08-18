@@ -18,7 +18,7 @@ function openDialog() {
 <template>
   <Button icon="pi pi-info-circle" size="normal" severity="secondary" variant="text" rounded @click="openDialog"/>
 
-  <Dialog v-model:visible="dialogVisible" :header="props.header" position="topright" :style="{ width: '40%' }">
+  <Dialog v-model:visible="dialogVisible" :header="props.header" position="topright" :draggable="false" :style="{ width: '40%' }">
     <slot></slot>
   </Dialog>
 </template>
