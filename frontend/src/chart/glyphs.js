@@ -37,8 +37,12 @@ function calculateGlyphData(xScale, yScale, glyphSize, glyphBoundingSize, featur
 
         if (!focusFeature || settings.focusIndices.value.length === 0) {
             focused = true
-        } else {
+        } else if (settings.focusSetOperation.value === "union") {
             focused = settings.focusIndices.value.some(i => d[focusFeature][i])
+        } else if (settings.focusSetOperation.value === "intersection") {
+            focused = settings.focusIndices.value.every(i => d[focusFeature][i])
+        } else {
+            throw Error("incorrect value for focusSetOperation")
         }
 
         // calculating glyph data

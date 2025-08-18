@@ -59,6 +59,10 @@ const glyphTypeOptions = computed(() => {
       ]
   }
 })
+const focusSetOperationOptions = [
+  { label: "Union", value: "union" },
+  { label: "Intersection", value: "intersection" }
+]
 
 watch(glyphTypeOptions, (newGlyphTypeOptions) => settings.glyphType.value = newGlyphTypeOptions[0].value)
 
@@ -70,6 +74,7 @@ settings.glyphData.value = "simple"
 settings.useDGrid.value = true
 settings.dimensionalityReduction.value = "pca"
 settings.glyphType.value = "simple"
+settings.focusSetOperation.value = "union"
 
 
 async function resetIndices() {
@@ -149,21 +154,35 @@ defineExpose({ resetIndices })
 
         <Divider />
 
-        <div v-if="classInfo && (settings.glyphData.value === 'groundTruth' || settings.glyphData.value === 'predictions')">
-          <div v-for="(c, index) in classInfo" class="class-item" :key="index">
-            <Checkbox v-model="settings.convexHullIndices.value" size="small" :value="index" />
-            <span class="color-box" :style="{ backgroundColor: tableau20[index] }"></span>
-            <span>{{ c["name"] }}</span>
+        <div v-if="classInfo && (settings.glyphData.value === 'groundTruth' || settings.glyphData.value === 'predictions')" class="column-flex">
+          <div>
+            <div class="list-title">Convex Hull</div>
+            <div v-for="(c, index) in classInfo" class="class-item" :key="index">
+              <Checkbox v-model="settings.convexHullIndices.value" size="small" :value="index" />
+              <span class="color-box" :style="{ backgroundColor: tableau20[index] }"></span>
+              <span>{{ c["name"] }}</span>
+            </div>
           </div>
-        </div>
 
-        <Divider v-if="classInfo && (settings.glyphData.value === 'groundTruth' || settings.glyphData.value === 'predictions')" />
+          <Divider layout="vertical" />
 
-        <div v-if="classInfo && (settings.glyphData.value === 'groundTruth' || settings.glyphData.value === 'predictions')">
-          <div v-for="(c, index) in classInfo" class="class-item" :key="index">
-            <Checkbox v-model="settings.focusIndices.value" size="small" :value="index" />
-            <span class="color-box" :style="{ backgroundColor: tableau20[index] }"></span>
-            <span>{{ c["name"] }}</span>
+          <div>
+
+            <div class="list-title">Focus</div>
+            <div v-for="(c, index) in classInfo" class="class-item" :key="index">
+              <Checkbox v-model="settings.focusIndices.value" size="small" :value="index" />
+              <span class="color-box" :style="{ backgroundColor: tableau20[index] }"></span>
+              <span>{{ c["name"] }}</span>
+            </div>
+
+            <div class="set-operation-container">
+              <div class="set-operation-title">Set Operation</div>
+              <div v-for="option in focusSetOperationOptions" class="class-item">
+                <RadioButton v-model="settings.focusSetOperation.value" :value="option.value" size="small" />
+                <label>{{ option.label }}</label>
+              </div>
+            </div>
+
           </div>
         </div>
 
@@ -210,5 +229,24 @@ defineExpose({ resetIndices })
   width: 16px;
   height: 16px;
   border-radius: 4px;
+}
+
+.column-flex {
+  display: flex;
+  width: 100%;
+  justify-content: space-around;
+}
+
+.list-title {
+  margin-bottom: 0.25rem;
+  font-weight: bold;
+}
+
+.set-operation-container {
+  margin-top: 0.75rem;
+}
+
+.set-operation-title {
+  font-style: italic;
 }
 </style>

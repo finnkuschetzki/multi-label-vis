@@ -74,7 +74,7 @@ async function setup() {
 
   // watch for setting changes that do not need data request
   watch(
-      [settings.useDGrid, settings.dimensionalityReduction, settings.glyphType, settings.convexHullIndices, settings.focusIndices],
+      [settings.useDGrid, settings.dimensionalityReduction, settings.glyphType, settings.convexHullIndices, settings.focusIndices, settings.focusSetOperation],
       () => updateChart(),
   )
 }

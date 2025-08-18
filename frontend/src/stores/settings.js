@@ -10,3 +10,4 @@ export const glyphType = ref()
 
 export const convexHullIndices = ref([])
 export const focusIndices = ref([])
+export const focusSetOperation = ref()
