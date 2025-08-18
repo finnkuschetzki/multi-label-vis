@@ -9,7 +9,8 @@ import {
     drawPartialFillGlyphs,
     drawSegmentFillGlyphs,
     drawWhiskerGlyphs,
-    drawComparisonGlyphs
+    drawBinaryComparisonGlyphs,
+    drawOpacityComparisonGlyphs
 } from "@/chart/glyphs.js"
 import { clearConvexHulls, drawConvexHull } from "@/chart/convexHulls.js";
 
@@ -95,8 +96,11 @@ export function updateChart() {
         case "whisker":
             drawWhiskerGlyphs(contentGroup, xScale, yScale, feature_column)
             break
-        case "comparison":
-            drawComparisonGlyphs(contentGroup, xScale, yScale, feature_column)
+        case "comparison-binary":
+            drawBinaryComparisonGlyphs(contentGroup, xScale, yScale, feature_column)
+            break;
+        case "comparison-opacity":
+            drawOpacityComparisonGlyphs(contentGroup, xScale, yScale, feature_column)
             break;
     }
 }

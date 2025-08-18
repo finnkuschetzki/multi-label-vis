@@ -54,7 +54,8 @@ const glyphTypeOptions = computed(() => {
       ]
     case "comparison":
       return [
-        { label: "Comparison", value: "comparison" }
+        { label: "Binary", value: "comparison-binary" },
+        { label: "Opacity", value: "comparison-opacity" }
       ]
   }
 })

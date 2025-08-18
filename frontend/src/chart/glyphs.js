@@ -170,6 +170,11 @@ function comparisonColor(s) {
 }
 
 
+function standardOpacity(s) {
+    return 1.0
+}
+
+
 function focusOpacity(s) {
     return s.focused ? 1.0 : 0.3
 }
@@ -511,7 +516,26 @@ export function drawWhiskerGlyphs(contentGroup, xScale, yScale, feature_column) 
 }
 
 
-export function drawComparisonGlyphs(contentGroup, xScale, yScale, feature_column) {
+export function drawBinaryComparisonGlyphs(contentGroup, xScale, yScale, feature_column) {
+    const { glyphSize, glyphBoundingSize } = getGlyphSize(xScale, yScale)
+    const { glyphData, segmentData } = calculateGlyphData(xScale, yScale, glyphSize, glyphBoundingSize, feature_column)
+    const strokeWidth = getStrokeWidth()
+
+    // removing old glyphs
+    clearGlyphs(contentGroup)
+
+    // segment fills
+    drawGlyphFillsBinary(contentGroup, segmentData, comparisonColor, standardOpacity)
+
+    // glyph lines (outline and segment borders)
+    drawGlyphLines(contentGroup, glyphData, strokeWidth)
+
+    // details overlay on click
+    overlayOnClick(contentGroup, glyphSize, glyphData)
+}
+
+
+export function drawOpacityComparisonGlyphs(contentGroup, xScale, yScale, feature_column) {
     const { glyphSize, glyphBoundingSize } = getGlyphSize(xScale, yScale)
     const { glyphData, segmentData } = calculateGlyphData(xScale, yScale, glyphSize, glyphBoundingSize, feature_column)
     const strokeWidth = getStrokeWidth()
