@@ -375,7 +375,7 @@ export function overlayOnClick(contentGroup, glyphSize, glyphData) {
         .data(glyphData)
         .enter()
         .append("rect")
-        .attr("class", "glyph-event.box")
+        .attr("class", "glyph-event-box")
         .attr("x", d => d.x)
         .attr("y", d => d.y)
         .attr("width", glyphSize)
