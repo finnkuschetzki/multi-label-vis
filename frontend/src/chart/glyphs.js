@@ -1,3 +1,5 @@
+import * as d3 from "d3"
+
 import { data } from "@/stores/data.js"
 import {
     dataPointGroundTruth,
@@ -370,7 +372,15 @@ function drawGlyphWhiskers(contentGroup, segmentData, strokeWidth) {
 /* EVENTS */
 
 
-export function overlayOnClick(contentGroup, glyphSize, glyphData) {
+export function clearEventBoxOutline() {
+    d3.selectAll(".glyph-event-box")
+        .attr("stroke", "none")
+}
+
+
+export function overlayOnClick(contentGroup, glyphBoundingSize, glyphData) {
+    const strokeWidth = getStrokeWidth()
+
     contentGroup.selectAll(".glyph-event-box")
         .data(glyphData)
         .enter()
@@ -378,12 +388,12 @@ export function overlayOnClick(contentGroup, glyphSize, glyphData) {
         .attr("class", "glyph-event-box")
         .attr("x", d => d.x)
         .attr("y", d => d.y)
-        .attr("width", glyphSize)
-        .attr("height", glyphSize)
+        .attr("width", glyphBoundingSize)
+        .attr("height", glyphBoundingSize)
         .attr("stroke", "none")
         .attr("fill", "none")
         .attr("pointer-events", "all")
-        .on("click", (event, d) => {
+        .on("click", function (event, d) {
             showOverlay.value = true
             dataPointImagePath.value = d.imagePath
             dataPointGroundTruth.value = d.groundTruth
@@ -396,6 +406,12 @@ export function overlayOnClick(contentGroup, glyphSize, glyphData) {
             } else {
                 overlayPosition.value = "top"
             }
+            // stroke
+            d3.selectAll(".glyph-event-box")
+                .attr("stroke", "none")
+            d3.select(event.currentTarget)
+                .attr("stroke", "black")
+                .attr("stroke-width", strokeWidth * 3)
         })
 }
 
@@ -415,7 +431,7 @@ export function drawSimpleGlyphs(contentGroup, xScale, yScale, feature_column) {
     drawCircles(contentGroup, glyphSize, glyphData)
 
     // details overlay on click
-    overlayOnClick(contentGroup, glyphSize, glyphData)
+    overlayOnClick(contentGroup, glyphBoundingSize, glyphData)
 }
 
 
@@ -434,7 +450,7 @@ export function drawGroundTruthGlyphs(contentGroup, xScale, yScale, feature_colu
     drawGlyphLines(contentGroup, glyphData, strokeWidth)
 
     // details overlay on click
-    overlayOnClick(contentGroup, glyphSize, glyphData)
+    overlayOnClick(contentGroup, glyphBoundingSize, glyphData)
 }
 
 
@@ -458,7 +474,7 @@ export function drawBinaryGlyphs(contentGroup, xScale, yScale, feature_column) {
     }
 
     // details overlay on click
-    overlayOnClick(contentGroup, glyphSize, glyphData)
+    overlayOnClick(contentGroup, glyphBoundingSize, glyphData)
 }
 
 
@@ -482,7 +498,7 @@ export function drawPartialFillGlyphs(contentGroup, xScale, yScale, feature_colu
     }
 
     // details overlay on click
-    overlayOnClick(contentGroup, glyphSize, glyphData)
+    overlayOnClick(contentGroup, glyphBoundingSize, glyphData)
 }
 
 
@@ -509,7 +525,7 @@ export function drawSegmentFillGlyphs(contentGroup, xScale, yScale, feature_colu
     }
 
     // details overlay on click
-    overlayOnClick(contentGroup, glyphSize, glyphData)
+    overlayOnClick(contentGroup, glyphBoundingSize, glyphData)
 }
 
 
@@ -528,7 +544,7 @@ export function drawBinaryComparisonGlyphs(contentGroup, xScale, yScale, feature
     drawGlyphLines(contentGroup, glyphData, strokeWidth)
 
     // details overlay on click
-    overlayOnClick(contentGroup, glyphSize, glyphData)
+    overlayOnClick(contentGroup, glyphBoundingSize, glyphData)
 }
 
 
@@ -547,5 +563,5 @@ export function drawOpacityComparisonGlyphs(contentGroup, xScale, yScale, featur
     drawGlyphLines(contentGroup, glyphData, strokeWidth)
 
     // details overlay on click
-    overlayOnClick(contentGroup, glyphSize, glyphData)
+    overlayOnClick(contentGroup, glyphBoundingSize, glyphData)
 }

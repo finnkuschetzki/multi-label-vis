@@ -1,13 +1,16 @@
 <script setup>
+import OverlayValueList from "@/components/OverlayValueList.vue";
+
 import { ref, onMounted, onUnmounted, watch } from "vue"
 
-import { showOverlay, dataPointGroundTruth, dataPointPredictions, dataPointImagePath } from "@/stores/overlay.js"
-import OverlayValueList from "@/components/OverlayValueList.vue";
 import httpClient from "@/httpClient/httpClient.js";
+import { showOverlay, dataPointGroundTruth, dataPointPredictions, dataPointImagePath } from "@/stores/overlay.js"
+import { clearEventBoxOutline } from "@/chart/glyphs.js";
 
 
 function hideOverlay() {
   showOverlay.value = false
+  clearEventBoxOutline()
 }
 
 function hideOverlayOnEsc(event) {
