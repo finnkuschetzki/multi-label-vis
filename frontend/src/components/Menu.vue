@@ -52,7 +52,6 @@ const glyphTypeOptions = computed(() => {
         { label: "Binary", value: "binary" },
         { label: "Partial Fill", value: "partialFill" },
         { label: "Segment Fill", value: "segmentFill" },
-        { label: "Whisker", value: "whisker" }
       ]
     case "comparison":
       return [
@@ -236,6 +235,17 @@ defineExpose({ resetIndices })
                   (not predicted) but is in ground truth has a high opacity, corresponding to a high error)</li>
               </ul>
             </div>
+          </InfoItem>
+        </div>
+
+        <div v-if="settings.glyphData.value === 'predictions'" class="toggle-switch-container">
+          <label for="whisker-toggle">Whisker</label>
+          <ToggleSwitch v-model="settings.includeWhisker.value" inputId="whisker-toggle" class="toggle-switch" />
+          <InfoItem header="Whisker">
+            <p>
+              Adds a middle line to sectors, called whisker. The length of the whisker linearly maps to the predicted
+              probability for corresponding labels (zero length corresponds to prediction 0.0, full length corresponds to 1.0).
+            </p>
           </InfoItem>
         </div>
 

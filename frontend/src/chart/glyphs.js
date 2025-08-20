@@ -452,6 +452,11 @@ export function drawBinaryGlyphs(contentGroup, xScale, yScale, feature_column) {
     // glyph lines (outline and segment borders)
     drawGlyphLines(contentGroup, glyphData, strokeWidth)
 
+    // whisker
+    if (settings.includeWhisker.value) {
+        drawGlyphWhiskers(contentGroup, segmentData, strokeWidth)
+    }
+
     // details overlay on click
     overlayOnClick(contentGroup, glyphSize, glyphData)
 }
@@ -470,6 +475,11 @@ export function drawPartialFillGlyphs(contentGroup, xScale, yScale, feature_colu
 
     // glyph lines (outline and segment borders)
     drawGlyphLines(contentGroup, glyphData, strokeWidth)
+
+    // whisker
+    if (settings.includeWhisker.value) {
+        drawGlyphWhiskers(contentGroup, segmentData, strokeWidth)
+    }
 
     // details overlay on click
     overlayOnClick(contentGroup, glyphSize, glyphData)
@@ -493,27 +503,10 @@ export function drawSegmentFillGlyphs(contentGroup, xScale, yScale, feature_colu
     // glyph lines (outline and segment borders)
     drawGlyphLines(contentGroup, glyphData, strokeWidth)
 
-    // details overlay on click
-    overlayOnClick(contentGroup, glyphSize, glyphData)
-}
-
-
-export function drawWhiskerGlyphs(contentGroup, xScale, yScale, feature_column) {
-    const { glyphSize, glyphBoundingSize } = getGlyphSize(xScale, yScale)
-    const { glyphData, segmentData } = calculateGlyphData(xScale, yScale, glyphSize, glyphBoundingSize, feature_column)
-    const strokeWidth = getStrokeWidth()
-
-    // removing old glyphs
-    clearGlyphs(contentGroup)
-
-    // segment fills
-    drawGlyphFillsBinary(contentGroup, segmentData, binarizedPredictionColor, focusOpacity)
-
-    // glyph lines (outline and segment borders)
-    drawGlyphLines(contentGroup, glyphData, strokeWidth)
-
-    // whiskers
-    drawGlyphWhiskers(contentGroup, segmentData, strokeWidth)
+    // whisker
+    if (settings.includeWhisker.value) {
+        drawGlyphWhiskers(contentGroup, segmentData, strokeWidth)
+    }
 
     // details overlay on click
     overlayOnClick(contentGroup, glyphSize, glyphData)

@@ -8,7 +8,6 @@ import {
     drawBinaryGlyphs,
     drawPartialFillGlyphs,
     drawSegmentFillGlyphs,
-    drawWhiskerGlyphs,
     drawBinaryComparisonGlyphs,
     drawOpacityComparisonGlyphs
 } from "@/chart/glyphs.js"
@@ -92,9 +91,6 @@ export function updateChart() {
             break
         case "segmentFill":
             drawSegmentFillGlyphs(contentGroup, xScale, yScale, feature_column)
-            break
-        case "whisker":
-            drawWhiskerGlyphs(contentGroup, xScale, yScale, feature_column)
             break
         case "comparison-binary":
             drawBinaryComparisonGlyphs(contentGroup, xScale, yScale, feature_column)

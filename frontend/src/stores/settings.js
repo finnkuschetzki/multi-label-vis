@@ -7,6 +7,7 @@ export const glyphData = ref()
 export const useDGrid = ref()
 export const dimensionalityReduction = ref()
 export const glyphType = ref()
+export const includeWhisker = ref()
 
 export const convexHullIndices = ref([])
 export const focusIndices = ref([])
