@@ -81,7 +81,9 @@ async function setup() {
       ],
       () => {
         updateChart()
-        overlay.value.hideOverlay()
+        if (overlay.value) {
+          overlay.value.hideOverlay()
+        }
       }
   )
 }
