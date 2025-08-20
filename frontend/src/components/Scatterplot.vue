@@ -21,6 +21,7 @@ showOverlay.value = false
 
 const container = useTemplateRef("container")
 const chart = useTemplateRef("chart")
+const overlay = useTemplateRef("overlay")
 
 
 // --- scatterplot setup ---
@@ -78,7 +79,10 @@ async function setup() {
           settings.useDGrid, settings.dimensionalityReduction, settings.glyphType, settings.includeWhisker,
           settings.convexHullIndices, settings.focusIndices, settings.focusSetOperation
       ],
-      () => updateChart(),
+      () => {
+        updateChart()
+        overlay.value.hideOverlay()
+      }
   )
 }
 
@@ -98,6 +102,7 @@ defineExpose({ setup })
           'top-overlay': overlayPosition === 'top',
           'bottom-overlay': overlayPosition === 'bottom',
         }"
+        ref="overlay"
     />
 
     <div v-else class="loading-container">

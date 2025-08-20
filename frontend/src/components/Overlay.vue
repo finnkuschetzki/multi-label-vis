@@ -43,6 +43,9 @@ watch(dataPointImagePath, async (newDataPointImagePath) => {
   imageURL.value = URL.createObjectURL(res.data)
   isImageSet.value = true
 })
+
+
+defineExpose({ hideOverlay })
 </script>
 
 <template>
