@@ -11,8 +11,8 @@ import os
 # PREREQUISITE:
 # run create_image_counts.py
 
-CAT_COUNT = 15
-MAX_CHOICE_CATS = 15
+CAT_COUNT = 20
+MAX_CHOICE_CATS = 20
 
 
 # --- loading COCO ---
@@ -37,8 +37,11 @@ category_subsets_df = pd.DataFrame({
     "cat_count": pd.Series(dtype="int64"),
     "cat_ids": pd.Series(dtype="object"),
     "entropy": pd.Series(dtype="float64"),
+    **{f"count_{i}": pd.Series(dtype="int64") for i in range(1, MAX_MIN_LABEL_STATS + 1)},
     **{f"count_min{i}": pd.Series(dtype="int64") for i in range(1, MAX_MIN_LABEL_STATS + 1)},
+    **{f"share_{i}_over_all": pd.Series(dtype="float64") for i in range(1, MAX_MIN_LABEL_STATS + 1)},
     **{f"share_min{i}_over_all": pd.Series(dtype="float64") for i in range(1, MAX_MIN_LABEL_STATS + 1)},
+    **{f"share_{i}_over_min1": pd.Series(dtype="float64") for i in range(2, MAX_MIN_LABEL_STATS + 1)},
     **{f"share_min{i}_over_min1": pd.Series(dtype="float64") for i in range(2, MAX_MIN_LABEL_STATS + 1)},
 })
 
@@ -60,14 +63,17 @@ for cat_combination in combinations(cat_choices, CAT_COUNT):
     result_df.to_csv(file_path, index=False)
     print(f"saved to {file_path}")
 
-    entropy, count_minX_, share_minX_over_all_, share_minX_over_min1_ = calc_category_statistics(result_df)
+    entropy, count_X_, count_minX_, share_X_over_all_, share_minX_over_all_, share_X_over_min1_, share_minX_over_min1_ = calc_category_statistics(result_df)
 
     new_row = {
         "cat_count": len(cat_combination),
         "cat_ids": cat_combination,
         "entropy": entropy,
+        **count_X_,
         **count_minX_,
+        **share_X_over_all_,
         **share_minX_over_all_,
+        **share_X_over_min1_,
         **share_minX_over_min1_
     }
 

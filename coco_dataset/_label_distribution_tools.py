@@ -2,7 +2,7 @@ import pandas as pd
 import numpy as np
 
 
-MAX_MIN_LABEL_STATS = 5
+MAX_MIN_LABEL_STATS = 20
 
 
 def limit_to_categories(coco, df, category_ids):
@@ -36,8 +36,21 @@ def calc_category_statistics(df):
 
     entropy = -np.sum(df["image_share"] * np.log2(df["image_share"] + 1e-10))
 
+    count_X_ = {
+        f"count_{i}": df.loc[df["cat_count"] == i, "image_count"].sum()
+        for i in range(1, MAX_MIN_LABEL_STATS + 1)
+    }
+
     count_minX_ = {
         f"count_min{i}": df.loc[df["cat_count"] >= i, "image_count"].sum()
+        for i in range(1, MAX_MIN_LABEL_STATS + 1)
+    }
+
+    share_X_over_all_ = {
+        f"share_{i}_over_all": np.divide(
+            count_X_[f"count_{i}"],
+            result_total_image_count if result_total_image_count > 0 else np.nan
+        )
         for i in range(1, MAX_MIN_LABEL_STATS + 1)
     }
 
@@ -45,6 +58,14 @@ def calc_category_statistics(df):
         f"share_min{i}_over_all": np.divide(
             count_minX_[f"count_min{i}"],
             result_total_image_count if result_total_image_count > 0 else np.nan
+        )
+        for i in range(1, MAX_MIN_LABEL_STATS + 1)
+    }
+
+    share_X_over_min1_ = {
+        f"share_{i}_over_min1": np.divide(
+            count_X_[f"count_{i}"],
+            count_minX_["count_min1"] if count_minX_["count_min1"] > 0 else np.nan
         )
         for i in range(1, MAX_MIN_LABEL_STATS + 1)
     }
@@ -57,4 +78,4 @@ def calc_category_statistics(df):
         for i in range(2, MAX_MIN_LABEL_STATS + 1)
     }
 
-    return entropy, count_minX_, share_minX_over_all_, share_minX_over_min1_
+    return entropy, count_X_, count_minX_, share_X_over_all_, share_minX_over_all_, share_X_over_min1_, share_minX_over_min1_
