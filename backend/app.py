@@ -28,17 +28,26 @@ def load_or_apply_and_save(model_name, model_path, data_type):
     print()
     print(f"--- {model_name}, {data_type} ---")
     if os.path.exists(f"computed_model_data/{model_name}/{data_type}_data.csv"):
+        start = time.time()
+        print()
+        print("Loading data...")
         data_ = read_csv_with_list_attributes(
             f"computed_model_data/{model_name}/{data_type}_data.csv",
             ["ground_truth", "pca_features", "umap_features", "tsne_features", "predictions", "binarized_predictions"]
         )
-        print()
-        print("data loaded")
+        end = time.time()
+        print(f"Done (t={end-start:.2f}s)")
     else:
-        data_ = apply_dimensionality_reduction(read_csv_with_list_attributes(
+        start = time.time()
+        print()
+        print("Reading embedding data...")
+        embedding_data = read_csv_with_list_attributes(
             f"../{model_path}/embedding_data_{data_type}.csv",
             ["ground_truth", "features", "predictions", "binarized_predictions"]
-        ))
+        )
+        end = time.time()
+        print(f"Done (t={end - start:.2f}s)")
+        data_ = apply_dimensionality_reduction(embedding_data)
         data_.to_csv(f"computed_model_data/{model_name}/{data_type}_data.csv", index=False)
     return data_
 
