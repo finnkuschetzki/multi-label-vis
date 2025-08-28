@@ -18,7 +18,7 @@ if __name__ == "__main__":
         # for every dimensionality reduction technique
         for dimensionality_reduction in ["pca", "umap", "tsne"]:
 
-            visual_metrics = pd.read_csv(f"evaluation_data/{model["name"]}/{dimensionality_reduction}.csv")
+            visual_metrics = pd.read_csv(f"evaluation_data/{model["name"]}/{dimensionality_reduction}/binarized_predictions.csv")
             spread = visual_metrics["spread"]
 
             print()

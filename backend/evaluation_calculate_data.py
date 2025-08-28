@@ -48,6 +48,10 @@ if __name__ == "__main__":
 
     # for every model
     for model in config["models"]:
+
+        if not os.path.isdir(f"evaluation_data/{model["name"]}"):
+            os.mkdir(f"evaluation_data/{model["name"]}")
+
         class_info = pd.read_csv(f"../{model["path"]}/class_info.csv")
 
         model_name = model["name"]
@@ -65,26 +69,30 @@ if __name__ == "__main__":
         # for every dimensionality reduction technique
         for dimensionality_reduction in ["pca", "umap", "tsne"]:
 
-            if not os.path.isdir(f"evaluation_data/{model["name"]}"):
-                os.mkdir(f"evaluation_data/{model["name"]}")
+            if not os.path.isdir(f"evaluation_data/{model["name"]}/{dimensionality_reduction}"):
+                os.mkdir(f"evaluation_data/{model["name"]}/{dimensionality_reduction}")
 
             features_or = np.vstack(or_df[f"{dimensionality_reduction}_features_or"])
-            binarized_predictions = np.vstack(or_df["binarized_predictions"])
             label_names = class_info["name"].to_numpy()
 
-            # calculate metrics
-            class_centroids_ = class_centroids(features_or, binarized_predictions, label_names)
-            intra_class_compactness_ = intra_class_compactness(features_or, binarized_predictions, label_names, class_centroids_)
-            inter_class_separation_ = inter_class_separation(class_centroids_)
-            spread_ = spread(intra_class_compactness_, inter_class_separation_)
+            # for binarizes_predictions and ground_truth
+            for data_type in ["binarized_predictions", "ground_truth"]:
 
-            # store metrics in df
-            metrics_df = pd.DataFrame()
-            metrics_df["id"] = class_info["id"]
-            metrics_df["name"] = class_info["name"]
-            metrics_df["intra_class_compactness"] = intra_class_compactness_
-            metrics_df["inter_class_separation"] = inter_class_separation_
-            metrics_df["spread"] = spread_
+                labels = np.vstack(or_df[data_type])
 
-            # save to csv
-            metrics_df.to_csv(f"evaluation_data/{model['name']}/{dimensionality_reduction}.csv")
+                # calculate metrics
+                class_centroids_ = class_centroids(features_or, labels, label_names)
+                intra_class_compactness_ = intra_class_compactness(features_or, labels, label_names, class_centroids_)
+                inter_class_separation_ = inter_class_separation(class_centroids_)
+                spread_ = spread(intra_class_compactness_, inter_class_separation_)
+
+                # store metrics in df
+                metrics_df = pd.DataFrame()
+                metrics_df["id"] = class_info["id"]
+                metrics_df["name"] = class_info["name"]
+                metrics_df["intra_class_compactness"] = intra_class_compactness_
+                metrics_df["inter_class_separation"] = inter_class_separation_
+                metrics_df["spread"] = spread_
+
+                # save to csv
+                metrics_df.to_csv(f"evaluation_data/{model['name']}/{dimensionality_reduction}/{data_type}.csv")
