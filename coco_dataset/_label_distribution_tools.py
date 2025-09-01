@@ -38,12 +38,12 @@ def calc_category_statistics(df):
 
     count_X_ = {
         f"count_{i}": df.loc[df["cat_count"] == i, "image_count"].sum()
-        for i in range(1, MAX_MIN_LABEL_STATS + 1)
+        for i in range(0, MAX_MIN_LABEL_STATS + 1)
     }
 
     count_minX_ = {
         f"count_min{i}": df.loc[df["cat_count"] >= i, "image_count"].sum()
-        for i in range(1, MAX_MIN_LABEL_STATS + 1)
+        for i in range(0, MAX_MIN_LABEL_STATS + 1)
     }
 
     share_X_over_all_ = {
@@ -51,7 +51,7 @@ def calc_category_statistics(df):
             count_X_[f"count_{i}"],
             result_total_image_count if result_total_image_count > 0 else np.nan
         )
-        for i in range(1, MAX_MIN_LABEL_STATS + 1)
+        for i in range(0, MAX_MIN_LABEL_STATS + 1)
     }
 
     share_minX_over_all_ = {

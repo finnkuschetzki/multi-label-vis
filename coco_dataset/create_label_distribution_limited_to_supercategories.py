@@ -37,11 +37,11 @@ category_subsets_df = pd.DataFrame({
     "supercat_names": pd.Series(dtype="object"),
     "cat_count": pd.Series(dtype="int64"),
     "entropy": pd.Series(dtype="float64"),
-    **{f"count_{i}": pd.Series(dtype="int64") for i in range(1, MAX_MIN_LABEL_STATS + 1)},
-    **{f"count_min{i}": pd.Series(dtype="int64") for i in range(1, MAX_MIN_LABEL_STATS + 1)},
-    **{f"share_{i}_over_all": pd.Series(dtype="float64") for i in range(1, MAX_MIN_LABEL_STATS + 1)},
+    **{f"count_{i}": pd.Series(dtype="int64") for i in range(0, MAX_MIN_LABEL_STATS + 1)},
+    **{f"count_min{i}": pd.Series(dtype="int64") for i in range(0, MAX_MIN_LABEL_STATS + 1)},
+    **{f"share_{i}_over_all": pd.Series(dtype="float64") for i in range(0, MAX_MIN_LABEL_STATS + 1)},
     **{f"share_min{i}_over_all": pd.Series(dtype="float64") for i in range(1, MAX_MIN_LABEL_STATS + 1)},
-    **{f"share_{i}_over_min1": pd.Series(dtype="float64") for i in range(2, MAX_MIN_LABEL_STATS + 1)},
+    **{f"share_{i}_over_min1": pd.Series(dtype="float64") for i in range(1, MAX_MIN_LABEL_STATS + 1)},
     **{f"share_min{i}_over_min1": pd.Series(dtype="float64") for i in range(2, MAX_MIN_LABEL_STATS + 1)},
 })
 
