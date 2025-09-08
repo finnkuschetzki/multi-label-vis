@@ -5,6 +5,7 @@ import pandas as pd
 from sklearn.metrics import pairwise_distances
 
 from process_data import read_csv_with_list_attributes, apply_overlap_removal
+from ast import literal_eval
 
 
 def class_centroids(positions, labels, list_of_labels):
@@ -96,3 +97,38 @@ if __name__ == "__main__":
 
                 # save to csv
                 metrics_df.to_csv(f"evaluation_data/{model['name']}/{dimensionality_reduction}/{data_type}.csv")
+
+        # original features
+        feat_df = pd.read_csv(f"../{model['path']}/embedding_data_val.csv")
+        # reading list attributes
+        feat_df["features"] = feat_df["features"].apply(literal_eval)
+        feat_df["ground_truth"] = feat_df["ground_truth"].apply(literal_eval)
+        feat_df["predictions"] = feat_df["predictions"].apply(literal_eval)
+        feat_df["binarized_predictions"] = feat_df["binarized_predictions"].apply(literal_eval)
+
+        if not os.path.isdir(f"evaluation_data/{model["name"]}/features"):
+            os.mkdir(f"evaluation_data/{model["name"]}/features")
+
+        features = np.vstack(feat_df["features"])
+        label_names = class_info["name"].to_numpy()
+
+        # for binarizes_predictions and ground_truth
+        for data_type in ["binarized_predictions", "ground_truth"]:
+            labels = np.vstack(feat_df[data_type])
+
+            # calculate metrics
+            class_centroids_ = class_centroids(features, labels, label_names)
+            intra_class_compactness_ = intra_class_compactness(features, labels, label_names, class_centroids_)
+            inter_class_separation_ = inter_class_separation(class_centroids_)
+            spread_ = spread(intra_class_compactness_, inter_class_separation_)
+
+            # store metrics in df
+            metrics_df = pd.DataFrame()
+            metrics_df["id"] = class_info["id"]
+            metrics_df["name"] = class_info["name"]
+            metrics_df["intra_class_compactness"] = intra_class_compactness_
+            metrics_df["inter_class_separation"] = inter_class_separation_
+            metrics_df["spread"] = spread_
+
+            # save to csv
+            metrics_df.to_csv(f"evaluation_data/{model['name']}/features/{data_type}.csv")
