@@ -11,7 +11,7 @@ import { PrimeVueResolver } from '@primevue/auto-import-resolver';
 export default defineConfig({
   plugins: [
     vue(),
-    vueDevTools(),
+    // vueDevTools(),
     Components({
       resolvers: [
           PrimeVueResolver()
