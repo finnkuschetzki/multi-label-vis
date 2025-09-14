@@ -188,7 +188,7 @@ function focusOpacity(s) {
 
 function comparisonOpacity(s) {
     if (s.binarizedPrediction) {
-        return s.prediction / 2
+        return (s.prediction - 0.5) * 2
     } else {
         return 1 - s.prediction * 2
     }
