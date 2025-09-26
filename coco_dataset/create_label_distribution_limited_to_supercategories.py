@@ -43,6 +43,7 @@ category_subsets_df = pd.DataFrame({
     **{f"share_min{i}_over_all": pd.Series(dtype="float64") for i in range(1, MAX_MIN_LABEL_STATS + 1)},
     **{f"share_{i}_over_min1": pd.Series(dtype="float64") for i in range(1, MAX_MIN_LABEL_STATS + 1)},
     **{f"share_min{i}_over_min1": pd.Series(dtype="float64") for i in range(2, MAX_MIN_LABEL_STATS + 1)},
+    "average_label_count": pd.Series(dtype="float64")
 })
 
 for super_cat_combination in chain.from_iterable(combinations(super_cats, r) for r in range(MAX_SUPER_CATS + 1)):
@@ -60,7 +61,7 @@ for super_cat_combination in chain.from_iterable(combinations(super_cats, r) for
     print(f"saved to {file_path}")
 
     # write into category_subsets_df
-    entropy, count_X_, count_minX_, share_X_over_all_, share_minX_over_all_, share_X_over_min1_, share_minX_over_min1_ = calc_category_statistics(result_df)
+    entropy, count_X_, count_minX_, share_X_over_all_, share_minX_over_all_, share_X_over_min1_, share_minX_over_min1_, average_label_count = calc_category_statistics(result_df)
 
     new_row = {
         "supercat_count": len(super_cat_combination),
@@ -72,7 +73,8 @@ for super_cat_combination in chain.from_iterable(combinations(super_cats, r) for
         **share_X_over_all_,
         **share_minX_over_all_,
         **share_X_over_min1_,
-        **share_minX_over_min1_
+        **share_minX_over_min1_,
+        "average_label_count": average_label_count
     }
 
     category_subsets_df = pd.concat([category_subsets_df, pd.DataFrame([new_row])], ignore_index=True)

@@ -78,4 +78,8 @@ def calc_category_statistics(df):
         for i in range(2, MAX_MIN_LABEL_STATS + 1)
     }
 
-    return entropy, count_X_, count_minX_, share_X_over_all_, share_minX_over_all_, share_X_over_min1_, share_minX_over_min1_
+    average_count = sum([
+        df.loc[df["cat_count"] == i, "image_count"].sum() * i for i in range(1, MAX_MIN_LABEL_STATS + 1)
+    ]) / count_minX_["count_min1"]
+
+    return entropy, count_X_, count_minX_, share_X_over_all_, share_minX_over_all_, share_X_over_min1_, share_minX_over_min1_, average_count
