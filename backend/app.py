@@ -35,6 +35,7 @@ def load_or_apply_and_save(model_name, model_path, data_type):
             f"computed_model_data/{model_name}/{data_type}_data.csv",
             ["ground_truth", "pca_features", "umap_features", "tsne_features", "predictions", "binarized_predictions"]
         )
+        print("Number of data points: ", len(data_))
         end = time.time()
         print(f"Done (t={end-start:.2f}s)")
     else:
